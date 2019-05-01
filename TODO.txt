@@ -1,0 +1,6 @@
+Minimal value:
+Client:
+1. context menu item for copy text
+2. window with editor of title and description
+3. POST this item
+4. Window with GET from databese with different filters and sortings
