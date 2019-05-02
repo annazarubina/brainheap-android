@@ -9,7 +9,14 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".WordsPickupActivity">
+        <activity android:name=".WordsPickupActivity"
+                  android:launchMode="singleTop"
+                  android:label="@string/process_text_action_name">>
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
