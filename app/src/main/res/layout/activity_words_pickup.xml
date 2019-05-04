@@ -14,6 +14,11 @@
                 android:text="TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/selectedTextView"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="36sp"/>
+        <Button
+                android:text="@string/send_words_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/send_to_server_button" android:textSize="18sp"
+                android:layout_marginTop="20dp" android:padding="30dp"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

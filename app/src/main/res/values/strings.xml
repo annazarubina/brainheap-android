@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Brain Heap</string>
     <string name="process_text_action_name">to BrainHeap</string>
+    <string name="send_words_button_text">Send to server</string>
 </resources>
