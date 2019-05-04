@@ -3,6 +3,7 @@ package com.brainheap.android
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
+import android.graphics.Color
 import android.widget.TextView
 import android.widget.Toast
 import android.text.style.ClickableSpan
@@ -10,6 +11,9 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.view.View
 import java.util.*
+import android.text.TextPaint
+
+
 
 
 class WordsPickupActivity : AppCompatActivity() {
@@ -32,7 +36,8 @@ class WordsPickupActivity : AppCompatActivity() {
         val selectedTextView:TextView = findViewById(R.id.selectedTextView)
         val text = intent
             .getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
-        selectedTextView.movementMethod = LinkMovementMethod.getInstance();
+        selectedTextView.movementMethod = LinkMovementMethod.getInstance()
+        selectedTextView.highlightColor = resources.getColor(android.R.color.transparent,resources.newTheme())
         selectedTextView.setText(makeWordsClickable(text.toString()), TextView.BufferType.SPANNABLE)
     }
 
@@ -48,12 +53,21 @@ class WordsPickupActivity : AppCompatActivity() {
             val e = spaceList[i]
             if (e - s > 2) {
                 ssb.setSpan(object : ClickableSpan() {
+                    var picked: Boolean = false
 
                     override fun onClick(widget: View) {
+                        picked = ! picked
+                        widget.invalidate()
                         Toast.makeText(
                             this@WordsPickupActivity, str.substring(s, e),
                             Toast.LENGTH_SHORT
                         ).show()
+
+                    }
+
+                     override  fun updateDrawState(ds: TextPaint) {
+                        ds.color = if (picked) Color.RED else Color.GREEN
+                        ds.isUnderlineText = false
                     }
                 }, s, e, 0)
             }
