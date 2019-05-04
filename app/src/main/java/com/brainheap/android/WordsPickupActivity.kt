@@ -33,19 +33,18 @@ class WordsPickupActivity : AppCompatActivity() {
         val text = intent
             .getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
         selectedTextView.movementMethod = LinkMovementMethod.getInstance();
-        selectedTextView.setText(makeWordsClickable(text.toString()), TextView.BufferType.SPANNABLE);
-        selectedTextView.text = text.toString()
+        selectedTextView.setText(makeWordsClickable(text.toString()), TextView.BufferType.SPANNABLE)
     }
 
     private fun makeWordsClickable(str: String): SpannableStringBuilder {
         val ssb = SpannableStringBuilder(str)
         val spaceList = ArrayList<Int>()
         spaceList.add(-1)
-        str.foldIndexed(spaceList) { i, L, c->if (c==' ') L.add(i);L}
+        str.foldIndexed(spaceList) { i, L, c->if (c==' '||c=='\n') L.add(i);L}
         spaceList.add(str.length)
 
         for (i in 1 until spaceList.size) {
-            val s = spaceList[i - 1]
+            val s = spaceList[i - 1] + 1
             val e = spaceList[i]
             if (e - s > 2) {
                 ssb.setSpan(object : ClickableSpan() {
