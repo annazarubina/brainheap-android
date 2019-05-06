@@ -9,14 +9,17 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".WordsPickupActivity"
-                  android:launchMode="singleTop"
-                  android:theme="@style/WordsTransparent"
-                  android:label="@string/process_text_action_name">
+        <activity
+                android:name=".WordsUploadActivity"
+                android:label="@string/process_text_action_name"
+                android:launchMode="singleTop"
+                android:theme="@style/WordsTransparent">
             <intent-filter>
-                <action android:name="android.intent.action.PROCESS_TEXT" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
+                <action android:name="android.intent.action.PROCESS_TEXT"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">

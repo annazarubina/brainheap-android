@@ -2,7 +2,7 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".WordsPickupActivity"
+        tools:context=".WordsUploadActivity"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +14,7 @@
         <TextView
                 android:text="TextView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/selectedTextView"
+                android:layout_height="wrap_content" android:id="@+id/selectedTextView1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="36sp"
         />
     </ScrollView>
