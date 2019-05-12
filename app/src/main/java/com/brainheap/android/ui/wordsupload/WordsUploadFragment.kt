@@ -102,15 +102,19 @@ class WordsUploadFragment : Fragment() {
                 var toastMessage: String
                 try {
                     val createItemRequest = retrofitService
-                        .createItemsAsync(
+                        .createItemAsync(
                             userId,
-                            wordsContext.wordList.filter { it.picked.value!! }.map { ItemView(it.word,wordsContext.context) }
+                            ItemView(
+                                wordsContext.wordList
+                                    .filter { it.picked.value!! }
+                                    .joinToString(" ") { it.word },
+                                wordsContext.context)
                         )
                     val createItemResponse = createItemRequest.await()
                     toastMessage = if (createItemResponse.isSuccessful) {
-                        val itemIdList = createItemResponse.body()?.joinToString { it.id }
+                        val itemId = createItemResponse.body()?.id
                         viewModel.itemSaved.postValue(true)
-                        "Item created Id $itemIdList"
+                        "Item created Id $itemId"
                     } else {
                         "CreateItem failed:${createItemResponse.code()}"
                     }

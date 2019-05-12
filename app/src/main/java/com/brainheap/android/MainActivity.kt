@@ -1,6 +1,5 @@
 package com.brainheap.android
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
