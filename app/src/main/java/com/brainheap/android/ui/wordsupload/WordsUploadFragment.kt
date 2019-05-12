@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
@@ -84,8 +85,8 @@ class WordsUploadFragment : Fragment() {
 
         send_to_server_button.setOnClickListener {
             val wordsContext = viewModel.wordContext.value
-            val sharedPref = activity!!.getPreferences(Context.MODE_PRIVATE)
-            val userId = sharedPref.getString(ID_PROP, "Unknown")
+            val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity)
+            val userId = sharedPref.getString(ID_PROP, "")
             if (userId.isNullOrEmpty()) {
                 Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -101,15 +102,15 @@ class WordsUploadFragment : Fragment() {
                 var toastMessage: String
                 try {
                     val createItemRequest = retrofitService
-                        .createItemAsync(
+                        .createItemsAsync(
                             userId,
-                            ItemView(wordsContext.wordList.joinToString { it.word }, wordsContext.context)
+                            wordsContext.wordList.filter { it.picked.value!! }.map { ItemView(it.word,wordsContext.context) }
                         )
                     val createItemResponse = createItemRequest.await()
                     toastMessage = if (createItemResponse.isSuccessful) {
-                        val itemId = createItemResponse.body()?.id
+                        val itemIdList = createItemResponse.body()?.joinToString { it.id }
                         viewModel.itemSaved.postValue(true)
-                        "Item created Id $itemId"
+                        "Item created Id $itemIdList"
                     } else {
                         "CreateItem failed:${createItemResponse.code()}"
                     }

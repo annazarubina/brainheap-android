@@ -18,4 +18,7 @@ interface RetrofitService {
 
     @POST("/items/new")
     fun createItemAsync(@Header("Authorization") userId: String, @Body item: ItemView): Deferred<Response<Item>>
+
+    @POST("/items")
+    fun createItemsAsync(@Header("Authorization") userId: String, @Body itemList: List<ItemView>): Deferred<Response<List<Item>>>
 }

@@ -3,6 +3,7 @@ package com.brainheap.android
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this) ?: return
         val name = sharedPref.getString(NAME_PROP, "Unknown")
         val editText = findViewById<EditText>(R.id.editText)
         editText.setText(name)
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (userId != null) {
-                    val sharedPref = getPreferences(Context.MODE_PRIVATE)
+                    val sharedPref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                     with(sharedPref.edit()) {
 
                             putString(NAME_PROP, email)
