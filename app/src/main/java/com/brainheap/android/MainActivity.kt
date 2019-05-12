@@ -8,7 +8,11 @@ import android.widget.EditText
 import android.widget.Toast
 import com.brainheap.android.model.UserView
 import com.brainheap.android.network.RetrofitFactory
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class MainActivity : AppCompatActivity() {
@@ -29,9 +33,11 @@ class MainActivity : AppCompatActivity() {
         val editText = findViewById<EditText>(R.id.editText)
 
         val email = editText.text.toString()
+        Toast.makeText(applicationContext, "Trying to fetch user data", Toast.LENGTH_SHORT).show()
 
         CoroutineScope(Dispatchers.IO).launch {
             val retrofitService = RetrofitFactory.makeRetrofitService()
+            var toastMessage = "Unknown error"
             try {
                 var userId: String? = null
                 val findUserRequest = retrofitService.findUser(email)
@@ -44,26 +50,33 @@ class MainActivity : AppCompatActivity() {
                     if (createUserResponse.isSuccessful) {
                         userId = createUserResponse.body()?.id
                     } else {
-                        Toast.makeText(applicationContext, createUserResponse.code().toString(), Toast.LENGTH_SHORT).show()
+                        toastMessage = "CreateUser failed:${createUserResponse.code()}"
                     }
                 } else {
-                    Toast.makeText(applicationContext, findUserResponse.code().toString(), Toast.LENGTH_SHORT).show()
-                }
-                if (userId!=null) {
-                    val sharedPref = getPreferences(Context.MODE_PRIVATE)
-                    with (sharedPref.edit()) {
+                    toastMessage = "FindUser failed:${findUserResponse.code()}"
 
-                        putString(NAME_PROP, email)
-                        putString(ID_PROP,userId)
-                        commit()
-                    }
-                    Toast.makeText(applicationContext, "Found/Registered Id $userId", Toast.LENGTH_LONG).show()
                 }
+
+                if (userId != null) {
+                    val sharedPref = getPreferences(Context.MODE_PRIVATE)
+                    with(sharedPref.edit()) {
+
+                            putString(NAME_PROP, email)
+                            putString(ID_PROP, userId)
+                            commit()
+                    }
+                    toastMessage =  "Found/Registered Id $userId"
+                }
+
             } catch (e: HttpException) {
-                Toast.makeText(applicationContext, "Exception ${e.message}", Toast.LENGTH_SHORT).show()
+                toastMessage = "Exception ${e.message}"
 
             } catch (e: Throwable) {
-                Toast.makeText(applicationContext, "Exception ${e.message}", Toast.LENGTH_SHORT).show()
+                toastMessage = "Exception ${e.message}"
+            }
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(applicationContext, toastMessage, Toast.LENGTH_SHORT).show()
             }
 
         }
