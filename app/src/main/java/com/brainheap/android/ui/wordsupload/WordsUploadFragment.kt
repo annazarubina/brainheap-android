@@ -78,6 +78,10 @@ class WordsUploadFragment : Fragment() {
             selectedTextView?.setText(ssb,TextView.BufferType.SPANNABLE)
         })
 
+        viewModel.itemSaved.observe(this, Observer <Boolean>{
+            if (it) activity!!.finish()
+        })
+
         send_to_server_button.setOnClickListener {
             val wordsContext = viewModel.wordContext.value
             val sharedPref = activity!!.getPreferences(Context.MODE_PRIVATE)
@@ -104,6 +108,7 @@ class WordsUploadFragment : Fragment() {
                     val createItemResponse = createItemRequest.await()
                     toastMessage = if (createItemResponse.isSuccessful) {
                         val itemId = createItemResponse.body()?.id
+                        viewModel.itemSaved.postValue(true)
                         "Item created Id $itemId"
                     } else {
                         "CreateItem failed:${createItemResponse.code()}"

@@ -8,6 +8,7 @@ data class WordsContext(val context: String, val wordList: List<Word>)
 
 class WordsUploadViewModel : ViewModel() {
     val wordContext = MutableLiveData<WordsContext>()
+    val itemSaved = MutableLiveData<Boolean>(false)
 
     fun init(ctxStr:String) {
         if (wordContext.value?.context == ctxStr) return
