@@ -1,0 +1,51 @@
+package com.brainheap.android.repository
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.brainheap.android.CredentialsHolder
+import com.brainheap.android.model.Item
+import com.brainheap.android.network.RetrofitFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+
+class ItemRepository {
+    private val retrofitService = RetrofitFactory.makeRetrofitService()
+    private val liveItemsList =  MutableLiveData<List<Item>>(emptyList())
+
+
+    fun getItems(): LiveData<List<Item>> {
+        syncList(false)
+        return liveItemsList
+    }
+
+    fun getItem(id: String): Item? {
+        syncList(false)
+        return liveItemsList.value!!.firstOrNull { id == it.id }
+    }
+
+    fun syncList(force: Boolean) {
+        if (liveItemsList.value.isNullOrEmpty() or force) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val itemListResponse = retrofitService.findItemsAsync(CredentialsHolder.userId!!).await()
+                    if (itemListResponse.isSuccessful) {
+                        liveItemsList.postValue(itemListResponse.body())
+                    }
+                }  catch (e: HttpException) {
+                    //toastMessage = "Exception ${e.message}"
+
+                } catch (e: Throwable) {
+                    //toastMessage = "Exception ${e.message}"
+                }
+            }
+        }
+    }
+
+    companion object {
+        val instance = ItemRepository()
+
+    }
+
+}

@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.brainheap.android.Constants
+import com.brainheap.android.CredentialsHolder
 import com.brainheap.android.R
 import com.brainheap.android.model.UserView
 import com.brainheap.android.network.RetrofitFactory
@@ -96,7 +97,7 @@ class LoginFragment : Fragment() {
                     }
 
                     if (userId != null) {
-                        val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity)
+                        //val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity)
                         with(sharedPref.edit()) {
 
                             putString(Constants.NAME_PROP, email)
@@ -104,6 +105,7 @@ class LoginFragment : Fragment() {
                             commit()
                         }
                         toastMessage = "Found/Registered Id $userId"
+                        CredentialsHolder.userId = userId
                         viewModel.loginSuccess.postValue(true)
                     }
 

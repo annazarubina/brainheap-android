@@ -7,9 +7,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.brainheap.android.Constants
+import com.brainheap.android.CredentialsHolder
 import com.brainheap.android.R
+import com.brainheap.android.ui.login.LoginViewModel
+import kotlinx.android.synthetic.main.fragment_words_list.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -31,6 +38,8 @@ class WordsListFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
+
+    private lateinit var viewModel: WordsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +63,26 @@ class WordsListFragment : Fragment() {
         val userId = sharedPref.getString(Constants.ID_PROP, "")
         if (userId.isNullOrEmpty()) {
             findNavController(this).navigate(R.id.action_force_login)
+        } else CredentialsHolder.userId = userId
+
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(WordsListViewModel::class.java)
         }
+
+        words_list_refresh_button.setOnClickListener { viewModel.refresh() }
+
+        val adapter = WordsListAdapter {
+
+        }
+        words_list_recyclerView.layoutManager = LinearLayoutManager(activity).apply {
+            orientation = RecyclerView.VERTICAL
+        }
+        words_list_recyclerView.adapter = adapter
+
+        viewModel.liveDataItemList.observe(this, Observer {
+            adapter.loadItems(it ?: emptyList())
+            adapter.notifyDataSetChanged()
+        })
     }
 
     // TODO: Rename method, update argument and hook method into UI event
