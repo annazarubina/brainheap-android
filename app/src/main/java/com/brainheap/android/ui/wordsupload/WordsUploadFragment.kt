@@ -1,5 +1,6 @@
 package com.brainheap.android.ui.wordsupload
 
+import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -14,7 +15,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import com.brainheap.android.Constants.ID_PROP
+import com.brainheap.android.Constants.NAME_PROP
 import com.brainheap.android.R
+import com.brainheap.android.model.ItemView
+import com.brainheap.android.model.UserView
+import com.brainheap.android.network.RetrofitFactory
+import kotlinx.android.synthetic.main.words_upload_fragment.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
 class WordsUploadFragment : Fragment() {
 
@@ -30,6 +42,8 @@ class WordsUploadFragment : Fragment() {
     ): View {
         return inflater.inflate(R.layout.words_upload_fragment, container, false)
     }
+
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -63,6 +77,50 @@ class WordsUploadFragment : Fragment() {
             }
             selectedTextView?.setText(ssb,TextView.BufferType.SPANNABLE)
         })
+
+        send_to_server_button.setOnClickListener {
+            val wordsContext = viewModel.wordContext.value
+            val sharedPref = activity!!.getPreferences(Context.MODE_PRIVATE)
+            val userId = sharedPref.getString(ID_PROP, "Unknown")
+            if (userId.isNullOrEmpty()) {
+                Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (!wordsContext!!.wordList.any {it.picked.value!!}){
+                Toast.makeText(activity!!.applicationContext, "Pick some words!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            Toast.makeText(activity!!.applicationContext, "Trying to create item", Toast.LENGTH_SHORT).show()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val retrofitService = RetrofitFactory.makeRetrofitService()
+                var toastMessage: String
+                try {
+                    val createItemRequest = retrofitService
+                        .createItemAsync(
+                            userId,
+                            ItemView(wordsContext.wordList.joinToString { it.word }, wordsContext.context)
+                        )
+                    val createItemResponse = createItemRequest.await()
+                    toastMessage = if (createItemResponse.isSuccessful) {
+                        val itemId = createItemResponse.body()?.id
+                        "Item created Id $itemId"
+                    } else {
+                        "CreateItem failed:${createItemResponse.code()}"
+                    }
+
+                } catch (e: HttpException) {
+                    toastMessage = "Exception ${e.message}"
+
+                } catch (e: Throwable) {
+                    toastMessage = "Exception ${e.message}"
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(activity!!.applicationContext, toastMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
     }
 

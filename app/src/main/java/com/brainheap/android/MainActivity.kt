@@ -6,19 +6,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import com.brainheap.android.Constants.ID_PROP
+import com.brainheap.android.Constants.NAME_PROP
 import com.brainheap.android.model.UserView
 import com.brainheap.android.network.RetrofitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class MainActivity : AppCompatActivity() {
 
-    val NAME_PROP = "user_name"
-    val ID_PROP = "user_id"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +40,12 @@ class MainActivity : AppCompatActivity() {
             var toastMessage = "Unknown error"
             try {
                 var userId: String? = null
-                val findUserRequest = retrofitService.findUser(email)
+                val findUserRequest = retrofitService.findUserAsync(email)
                 val findUserResponse = findUserRequest.await()
                 if (findUserResponse.isSuccessful) {
                     userId = findUserResponse.body()?.id
                 } else if (findUserResponse.code() == 404) {
-                    val createUserRequest = retrofitService.createUser(UserView(email,email))
+                    val createUserRequest = retrofitService.createUserAsync(UserView(email,email))
                     val createUserResponse = createUserRequest.await()
                     if (createUserResponse.isSuccessful) {
                         userId = createUserResponse.body()?.id
