@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/nav_graph.xml"
+            app:startDestination="@id/wordsListFragment">
+
+    <fragment android:id="@+id/wordsListFragment" android:name="com.brainheap.android.ui.wordslist.WordsListFragment"
+              android:label="fragment_words_list" tools:layout="@layout/fragment_words_list">
+        <action android:id="@+id/action_view_word_detail"
+                app:destination="@id/wordDetailFragment"/>
+        <action android:id="@+id/action_force_login" app:destination="@id/loginFragment"
+                app:popUpTo="@+id/wordsListFragment" app:popUpToInclusive="true"/>
+    </fragment>
+    <fragment android:id="@+id/wordDetailFragment" android:name="com.brainheap.android.ui.worddetail.WordDetailFragment"
+              android:label="fragment_word_detail" tools:layout="@layout/fragment_word_detail"/>
+    <fragment android:id="@+id/loginFragment" android:name="com.brainheap.android.ui.login.LoginFragment"
+              android:label="fragment_login" tools:layout="@layout/fragment_login">
+        <action android:id="@+id/action_logged_in" app:destination="@id/wordsListFragment"
+                app:popUpTo="@+id/loginFragment" app:popUpToInclusive="true"/>
+    </fragment>
+</navigation>
