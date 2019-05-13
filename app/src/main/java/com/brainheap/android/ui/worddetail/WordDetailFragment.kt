@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.brainheap.android.R
+import com.brainheap.android.repository.ItemRepository
+import kotlinx.android.synthetic.main.fragment_word_detail.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -30,6 +32,7 @@ class WordDetailFragment : Fragment() {
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -44,6 +47,12 @@ class WordDetailFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_word_detail, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val itemId =  WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
+        word_detail_text_view.text = ItemRepository.instance.getItem(itemId)?.description
     }
 
     // TODO: Rename method, update argument and hook method into UI event

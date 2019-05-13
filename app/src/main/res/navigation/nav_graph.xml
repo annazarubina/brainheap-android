@@ -12,7 +12,9 @@
                 app:popUpTo="@+id/wordsListFragment" app:popUpToInclusive="true"/>
     </fragment>
     <fragment android:id="@+id/wordDetailFragment" android:name="com.brainheap.android.ui.worddetail.WordDetailFragment"
-              android:label="fragment_word_detail" tools:layout="@layout/fragment_word_detail"/>
+              android:label="fragment_word_detail" tools:layout="@layout/fragment_word_detail">
+        <argument android:name="ItemId" app:argType="string"/>
+    </fragment>
     <fragment android:id="@+id/loginFragment" android:name="com.brainheap.android.ui.login.LoginFragment"
               android:label="fragment_login" tools:layout="@layout/fragment_login">
         <action android:id="@+id/action_logged_in" app:destination="@id/wordsListFragment"

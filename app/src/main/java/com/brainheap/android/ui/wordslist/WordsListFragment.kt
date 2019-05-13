@@ -72,7 +72,8 @@ class WordsListFragment : Fragment() {
         words_list_refresh_button.setOnClickListener { viewModel.refresh() }
 
         val adapter = WordsListAdapter {
-
+            val action = WordsListFragmentDirections.actionViewWordDetail(it.id)
+            findNavController(this).navigate(action)
         }
         words_list_recyclerView.layoutManager = LinearLayoutManager(activity).apply {
             orientation = RecyclerView.VERTICAL
