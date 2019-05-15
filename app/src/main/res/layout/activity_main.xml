@@ -10,11 +10,11 @@
 
     <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="148dp" >
+            android:layout_height="100dp" >
 
         <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="128dp"
+                android:layout_height="100dp"
                 android:background="#01579b"
                 android:paddingBottom="20dp"
                 android:paddingLeft="20dp"
@@ -33,7 +33,7 @@
         <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:layout_marginTop="128dp"
+                android:layout_marginTop="100dp"
                 android:background="#88CECECE" />
 
     </RelativeLayout>
@@ -48,7 +48,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="43dp">
+                android:layout_marginBottom="40dp">
 
             <fragment
                     android:layout_width="fill_parent"

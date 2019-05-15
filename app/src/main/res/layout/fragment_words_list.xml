@@ -16,8 +16,7 @@
         <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="64dp">
+                android:layout_alignParentBottom="true">
 
             <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="fill_parent"
@@ -28,34 +27,18 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginBottom="8dp"/>
 
+            <com.gc.materialdesign.views.ButtonFloat
+                    android:id="@+id/word_list_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginEnd="24dp"
+                    android:background="#1E88E5"
+                    materialdesign:animate="true"
+                    materialdesign:iconDrawable="@drawable/ic_action_new" />
+
         </RelativeLayout>
 
-        <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
-                android:layout_alignParentBottom="true">
-
-            <com.gc.materialdesign.views.LayoutRipple
-                    android:layout_width="fill_parent"
-                    android:layout_height="64dp"
-                    android:background="#FFF"
-                    android:clickable="true"
-                    android:id="@+id/word_list_refresh">
-
-                <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="32dp"
-                        android:src="@drawable/icn_button"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="104dp"
-                        android:text="Refresh"/>
-            </com.gc.materialdesign.views.LayoutRipple>
-        </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>
