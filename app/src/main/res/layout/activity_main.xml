@@ -1,21 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
-    <fragment
-            android:id="@+id/nav_host_fragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#FFF"
+              android:orientation="vertical"
+              tools:context=".MainActivity">
 
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="148dp" >
+
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="128dp"
+                android:background="#01579b"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Brain heap"
+                    android:textColor="#FFF"
+                    android:textSize="25dp" />
+        </RelativeLayout>
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="128dp"
+                android:background="#88CECECE" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="bottom">
+
+
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="43dp">
+
+            <fragment
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/nav_host_fragment"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+
+                    app:defaultNavHost="true"
+                    app:navGraph="@navigation/nav_graph"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_alignParentBottom="true"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:background="#01579b">
+        </RelativeLayout>
+
+    </RelativeLayout>
+</LinearLayout>
