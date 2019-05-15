@@ -13,6 +13,7 @@ import retrofit2.HttpException
 class ItemRepository {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
     private val liveItemsList =  MutableLiveData<List<Item>>(emptyList())
+    val isRefreshing = MutableLiveData<Boolean>(false)
 
 
     fun getItems(): LiveData<List<Item>> {
@@ -28,6 +29,7 @@ class ItemRepository {
     fun syncList(force: Boolean) {
         if (liveItemsList.value.isNullOrEmpty() or force) {
             CoroutineScope(Dispatchers.IO).launch {
+                isRefreshing.postValue(true)
                 try {
                     val itemListResponse = retrofitService.findItemsAsync(CredentialsHolder.userId!!).await()
                     if (itemListResponse.isSuccessful) {
@@ -39,8 +41,10 @@ class ItemRepository {
                 } catch (e: Throwable) {
                     //toastMessage = "Exception ${e.message}"
                 }
+                isRefreshing.postValue(false)
             }
         }
+
     }
 
     companion object {
