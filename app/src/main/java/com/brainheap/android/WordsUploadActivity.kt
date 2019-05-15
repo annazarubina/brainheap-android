@@ -29,8 +29,17 @@ class WordsUploadActivity : AppCompatActivity() {
     }
 
     private fun handleIntent() {
-        val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
-        viewModel.init(text.toString())
+        when {
+            intent?.action == Intent.ACTION_SEND -> {
+                val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
+                viewModel.init(text.toString())
+            }
+            intent?.action == Intent.ACTION_PROCESS_TEXT -> {
+                val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
+                viewModel.init(text.toString())
+            }
+        }
+
     }
 
 }
