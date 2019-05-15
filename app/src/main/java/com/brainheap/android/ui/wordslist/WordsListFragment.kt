@@ -70,8 +70,8 @@ class WordsListFragment : Fragment() {
             viewModel = ViewModelProviders.of(it).get(WordsListViewModel::class.java)
         }
 
-        word_list_refresh.setOnClickListener { viewModel.refresh() }
-
+        words_list_refresh_button.setOnClickListener { viewModel.refresh() }
+        word_list_refresh.setOnRefreshListener { viewModel.refresh() }
 
         val adapter = WordsListAdapter {
             val action = WordsListFragmentDirections.actionViewWordDetail(it.id)
@@ -86,6 +86,8 @@ class WordsListFragment : Fragment() {
             adapter.loadItems(it ?: emptyList())
             adapter.notifyDataSetChanged()
         })
+        viewModel.isRefreshing.observe(this, Observer {
+            word_list_refresh.isRefreshing = it })
     }
 
     // TODO: Rename method, update argument and hook method into UI event
