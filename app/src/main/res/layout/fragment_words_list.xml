@@ -40,7 +40,7 @@
                     android:layout_height="64dp"
                     android:background="#FFF"
                     android:clickable="true"
-                    android:id="@+id/words_list_refresh_button">
+                    android:id="@+id/word_list_refresh">
 
                 <ImageView
                         android:layout_width="40dp"
