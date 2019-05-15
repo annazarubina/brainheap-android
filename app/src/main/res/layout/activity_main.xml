@@ -8,9 +8,6 @@
               android:orientation="vertical"
               tools:context=".MainActivity">
 
-    <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="100dp" >
 
         <RelativeLayout
                 android:layout_width="fill_parent"
@@ -27,50 +24,47 @@
                     android:layout_centerHorizontal="true"
                     android:text="Brain heap"
                     android:textColor="#FFF"
-                    android:textSize="25dp" />
+                    android:textSize="25sp"
+                    android:layout_marginTop="46dp"
+                    android:layout_alignParentTop="true"/>
         </RelativeLayout>
 
         <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:layout_marginTop="100dp"
                 android:background="#88CECECE" />
 
-    </RelativeLayout>
 
-    <RelativeLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="bottom">
 
 
-        <RelativeLayout
+        <fragment
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="40dp">
+                android:layout_height="0dp"
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_graph"
+                materialdesign:layout_constraintStart_toStartOf="parent"
+                materialdesign:layout_constraintEnd_toEndOf="parent"
+                materialdesign:layout_constraintTop_toTopOf="parent"
+                materialdesign:layout_constraintBottom_toTopOf="@+id/buttom_line"/>
 
-            <fragment
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:id="@+id/nav_host_fragment"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-
-                    app:defaultNavHost="true"
-                    app:navGraph="@navigation/nav_graph"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <FrameLayout
+                android:id="@+id/buttom_line"
                 android:layout_alignParentBottom="true"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:background="#01579b">
-        </RelativeLayout>
+                android:background="#01579b"
+                materialdesign:layout_constraintStart_toStartOf="parent"
+                materialdesign:layout_constraintEnd_toEndOf="parent"
+                materialdesign:layout_constraintBottom_toBottomOf="parent"
+                materialdesign:layout_constraintTop_toBottomOf="@+id/nav_host_fragment">
+        </FrameLayout>
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

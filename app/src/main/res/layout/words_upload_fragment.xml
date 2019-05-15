@@ -20,20 +20,17 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="36sp"
         />
     </ScrollView>
-    <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="20dp" >
-    </RelativeLayout>
-    <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="72dp" >
 
-        <com.gc.materialdesign.views.ButtonRectangle
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="72dp" android:layout_marginTop="20dp">
+
+        <Button
                 android:id="@+id/send_to_server_button"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="#1E88E5"
                 android:layout_width="200dp"
-                android:text="@string/send_words_button_text" />
+                android:text="@string/send_words_button_text"/>
     </RelativeLayout>
 </LinearLayout>
