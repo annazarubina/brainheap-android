@@ -32,6 +32,8 @@ import retrofit2.HttpException
 class WordsUploadFragment : Fragment() {
 
     companion object {
+        val textColor = 0xFF0D47A1.toInt()
+        val pickedTextColor = 0xFF82B1FF.toInt()
         fun newInstance() = WordsUploadFragment()
     }
 
@@ -68,7 +70,7 @@ class WordsUploadFragment : Fragment() {
                         ).show()
                     }
                     override  fun updateDrawState(ds: TextPaint) {
-                        ds.color = if (picked) Color.RED else Color.GREEN
+                        ds.color = if (picked) pickedTextColor else textColor
                     }
                 }
                 word.picked.observe(this, Observer <Boolean>{picked->
