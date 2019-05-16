@@ -61,10 +61,10 @@ class WordsUploadFragment : Fragment() {
             val ssb = SpannableStringBuilder(wordsContext.context)
             for (word in wordsContext.wordList) {
                 val span = object : ClickableSpan() {
-                    var pickedTime : Date? = null
+                    var pickedTime : Long? = null
                     override fun onClick(widget: View) {
                         if(word.pickedTime.value == null) {
-                            word.pickedTime.value = Calendar.getInstance(TimeZone.getTimeZone("UTC")).time
+                            word.pickedTime.value = System.currentTimeMillis()
                         } else {
                             word.pickedTime.value = null
                         }
@@ -114,26 +114,12 @@ class WordsUploadFragment : Fragment() {
                             ItemView(
                                 wordsContext.wordList
                                     .filter { it.pickedTime.value != null }
-                                    .sortedWith(
-                                        Comparator { t1, t2 ->
-                                            when {
-                                                t1.pickedTime.value!! > t2.pickedTime.value!! -> 1
-                                                t1.pickedTime.value!! == t2.pickedTime.value!! -> 0
-                                                else -> -1
-                                            }
-                                        }
-                                    )
-                                    .map{
-                                        val chars = it.word.toCharArray()
-                                        var startPos : Int = 0
-                                        while (!chars[startPos].isLetterOrDigit()) {
-                                            startPos++
-                                        }
-                                        var endPos : Int = it.word.length
-                                        while (endPos > 0 && !chars[endPos - 1].isLetterOrDigit()) {
-                                            endPos--
-                                        }
-                                        it.word.substring(startPos, endPos).toLowerCase()
+                                    .sortedBy {it.pickedTime.value}
+                                    .map{ word ->
+                                        word.word
+                                            .dropWhile { !it.isLetterOrDigit() }
+                                            .dropLastWhile { !it.isLetterOrDigit() }
+                                            .toLowerCase()
                                     }
                                     .joinToString(" ") { it },
                                 wordsContext.context)

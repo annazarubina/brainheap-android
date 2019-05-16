@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import java.util.*
 
-data class Word(val word: String, val start: Int, val end: Int, var pickedTime: MutableLiveData<Date?>)
+data class Word(val word: String, val start: Int, val end: Int, var pickedTime: MutableLiveData<Long?>)
 data class WordsContext(val context: String, val wordList: List<Word>)
 
 class WordsUploadViewModel : ViewModel() {
