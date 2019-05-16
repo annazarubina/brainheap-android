@@ -2,8 +2,9 @@ package com.brainheap.android.ui.wordsupload
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.util.*
 
-data class Word(val word: String, val start: Int, val end: Int, val picked: MutableLiveData<Boolean>)
+data class Word(val word: String, val start: Int, val end: Int, var pickedTime: MutableLiveData<Date?>)
 data class WordsContext(val context: String, val wordList: List<Word>)
 
 class WordsUploadViewModel : ViewModel() {
@@ -23,7 +24,7 @@ class WordsUploadViewModel : ViewModel() {
             val s = spaceList[i - 1] + 1
             val e = spaceList[i]
             if (e - s > 2) {
-                wordList.add(Word(ctxStr.substring(s, e),s,e, MutableLiveData(false)))
+                wordList.add(Word(ctxStr.substring(s, e),s,e, MutableLiveData(null)))
             }
         }
         wordContext.value = WordsContext(ctxStr,wordList)

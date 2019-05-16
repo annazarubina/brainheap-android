@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.util.*
 
 class WordsUploadFragment : Fragment() {
 
@@ -60,9 +61,13 @@ class WordsUploadFragment : Fragment() {
             val ssb = SpannableStringBuilder(wordsContext.context)
             for (word in wordsContext.wordList) {
                 val span = object : ClickableSpan() {
-                    var picked = false
+                    var pickedTime : Date? = null
                     override fun onClick(widget: View) {
-                        word.picked.value =  word.picked.value?.not()
+                        if(word.pickedTime.value == null) {
+                            word.pickedTime.value = Calendar.getInstance(TimeZone.getTimeZone("UTC")).time
+                        } else {
+                            word.pickedTime.value = null
+                        }
                         widget.invalidate()
                         Toast.makeText(
                             activity, word.word,
@@ -70,11 +75,11 @@ class WordsUploadFragment : Fragment() {
                         ).show()
                     }
                     override  fun updateDrawState(ds: TextPaint) {
-                        ds.color = if (picked) pickedTextColor else textColor
+                        ds.color = if (pickedTime != null) pickedTextColor else textColor
                     }
                 }
-                word.picked.observe(this, Observer <Boolean>{picked->
-                    span.picked = picked
+                word.pickedTime.observe(this, Observer { pickedTime->
+                    span.pickedTime = pickedTime
                 })
                 ssb.setSpan(span, word.start, word.end, 0)
             }
@@ -93,7 +98,7 @@ class WordsUploadFragment : Fragment() {
                 Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (!wordsContext!!.wordList.any {it.picked.value!!}){
+            if (!wordsContext!!.wordList.any { it.pickedTime.value != null }){
                 Toast.makeText(activity!!.applicationContext, "Pick some words!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -108,7 +113,16 @@ class WordsUploadFragment : Fragment() {
                             userId,
                             ItemView(
                                 wordsContext.wordList
-                                    .filter { it.picked.value!! }
+                                    .filter { it.pickedTime.value != null }
+                                    .sortedWith(
+                                        Comparator { t1, t2 ->
+                                            when {
+                                                t1.pickedTime.value!! > t2.pickedTime.value!! -> 1
+                                                t1.pickedTime.value!! == t2.pickedTime.value!! -> 0
+                                                else -> -1
+                                            }
+                                        }
+                                    )
                                     .joinToString(" ") { it.word },
                                 wordsContext.context)
                         )
