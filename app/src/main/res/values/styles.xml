@@ -1,8 +1,9 @@
 <resources>
     <style name="AppTheme.BrainHeap" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="colorPrimary">#01579b</item>
     </style>
 
     <style name="WordsTransparent" parent="Theme.AppCompat.Light.DarkActionBar">
