@@ -123,7 +123,19 @@ class WordsUploadFragment : Fragment() {
                                             }
                                         }
                                     )
-                                    .joinToString(" ") { it.word },
+                                    .map{
+                                        val chars = it.word.toCharArray()
+                                        var startPos : Int = 0
+                                        while (!chars[startPos].isLetterOrDigit()) {
+                                            startPos++
+                                        }
+                                        var endPos : Int = it.word.length
+                                        while (endPos > 0 && !chars[endPos - 1].isLetterOrDigit()) {
+                                            endPos--
+                                        }
+                                        it.word.substring(startPos, endPos).toLowerCase()
+                                    }
+                                    .joinToString(" ") { it },
                                 wordsContext.context)
                         )
                     val createItemResponse = createItemRequest.await()
