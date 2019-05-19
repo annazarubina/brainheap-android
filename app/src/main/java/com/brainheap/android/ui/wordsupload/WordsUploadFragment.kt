@@ -128,7 +128,7 @@ class WordsUploadFragment : Fragment() {
                                             .toLowerCase()
                                     }
                                     .joinToString(" ") { it },
-                                wordsContext.context + translatedText?.let { "/// $translatedText" }
+                                wordsContext.context + translatedText?.let { " /// $translatedText" }
                             )
                         )
                     val createItemResponse = createItemRequest.await()
