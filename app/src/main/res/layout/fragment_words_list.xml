@@ -18,9 +18,33 @@
             android:layout_marginBottom="16dp"
             materialdesign:layout_constraintBottom_toBottomOf="parent" materialdesign:backgroundTint="#1E88E5"/>
 
+    <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            materialdesign:layout_constraintEnd_toEndOf="parent"
+            materialdesign:layout_constraintStart_toStartOf="parent"
+            materialdesign:layout_constraintBottom_toTopOf="@id/divider"
+            materialdesign:layout_constraintTop_toTopOf="parent"
+            android:spinnerMode="dropdown"/>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="?android:attr/listDivider"
+            materialdesign:layout_constraintEnd_toEndOf="parent"
+            materialdesign:layout_constraintStart_toStartOf="parent"
+            materialdesign:layout_constraintBottom_toTopOf="@id/word_list_refresh"
+            materialdesign:layout_constraintTop_toBottomOf="@id/spinner"
+    />
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
+                    materialdesign:layout_constraintTop_toBottomOf="@id/divider"
+                    materialdesign:layout_constraintBottom_toBottomOf="parent"
+                    materialdesign:layout_constraintEnd_toEndOf="parent"
+                    materialdesign:layout_constraintStart_toStartOf="parent"
                     tools:context=".ui.wordslist.WordsListFragment"
                     android:id="@+id/word_list_refresh">
 
@@ -34,7 +58,7 @@
                 android:layout_marginBottom="8dp">
         </androidx.recyclerview.widget.RecyclerView>
 
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

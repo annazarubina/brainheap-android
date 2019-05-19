@@ -23,7 +23,7 @@ interface RetrofitService {
     fun createItemsAsync(@Header("Authorization") userId: String, @Body itemList: List<ItemView>): Deferred<Response<List<Item>>>
 
     @GET("/items")
-    fun findItemsAsync(@Header("Authorization") userId: String): Deferred<Response<List<Item>>>
+    fun findItemsAsync(@Header("Authorization") userId: String, @Query("query") query: String?): Deferred<Response<List<Item>>>
 
     @DELETE("/items/{itemId}")
     fun deleteItemAsync(@Header("Authorization") userId: String, @Path("itemId") itemId:String): Deferred<Response<Item>>

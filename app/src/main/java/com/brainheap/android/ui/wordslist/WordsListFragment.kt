@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.brainheap.android.Constants
 import com.brainheap.android.CredentialsHolder
 import com.brainheap.android.R
+import com.brainheap.android.repository.ItemsListPeriod
 import kotlinx.android.synthetic.main.fragment_words_list.*
 
 
@@ -61,8 +64,8 @@ class WordsListFragment : Fragment() {
         //attach swipe handler
         val swipeHandler = object : WordsListSwipeCallback(context!!) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val adapter = words_list_recyclerView.adapter as WordsListAdapter
-                viewModel.deleteItem(adapter.items[viewHolder.adapterPosition].id)
+                val swipeAdapter = words_list_recyclerView.adapter as WordsListAdapter
+                viewModel.deleteItem(swipeAdapter.items[viewHolder.adapterPosition].id)
 
             }
         }
@@ -76,6 +79,27 @@ class WordsListFragment : Fragment() {
         })
         viewModel.isRefreshing.observe(this, Observer {
             word_list_refresh.isRefreshing = it })
+
+        //Setup spinner
+        ArrayAdapter.createFromResource(
+            activity,
+            R.array.items_time_array,
+            R.layout.word_list_spinner
+        ).also { spinAdapter ->
+            spinAdapter.setDropDownViewResource(R.layout.word_list_spinner)
+            spinner.adapter = spinAdapter
+        }
+        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.setWordsListPeriod(ItemsListPeriod.values()[position])
+            }
+        }
+        viewModel.period.observe(this, Observer{
+            spinner.setSelection(it.ordinal)
+        })
     }
 
 }
