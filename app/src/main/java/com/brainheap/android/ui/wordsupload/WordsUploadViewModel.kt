@@ -41,7 +41,7 @@ class WordsUploadViewModel : ViewModel() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val request = retrofitService
-                        .translateAsync(userId, UrlEscapers.urlFragmentEscaper().escape(ctxStr))
+                        .translateAsync(userId, "\"" + ctxStr + "\"")
                     val response = request.await()
                     if (response.isSuccessful) {
                         translatedText.postValue(response.body())
