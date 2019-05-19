@@ -27,4 +27,7 @@ interface RetrofitService {
 
     @DELETE("/items/{itemId}")
     fun deleteItemAsync(@Header("Authorization") userId: String, @Path("itemId") itemId:String): Deferred<Response<Item>>
+
+    @GET("/translate")
+    fun translateAsync(@Header("Authorization") userId: String, @Query("srcString") srcString: String ): Deferred<Response<String>>
 }
