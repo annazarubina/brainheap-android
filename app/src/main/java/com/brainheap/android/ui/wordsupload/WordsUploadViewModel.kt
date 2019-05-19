@@ -44,7 +44,7 @@ class WordsUploadViewModel : ViewModel() {
                         .translateAsync(userId, UrlEscapers.urlFragmentEscaper().escape(ctxStr))
                     val response = request.await()
                     if (response.isSuccessful) {
-                        translatedText.value = response.body()
+                        translatedText.postValue(response.body())
 
                     }
                 } catch (e: Throwable) {
