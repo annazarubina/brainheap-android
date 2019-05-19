@@ -13,4 +13,8 @@ class WordsListViewModel: ViewModel() {
     fun refresh() {
         itemRepositry.syncList(true)
     }
+
+    fun deleteItem(id: String) {
+        itemRepositry.deleteItem(id)
+    }
 }

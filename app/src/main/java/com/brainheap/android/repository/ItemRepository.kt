@@ -25,6 +25,24 @@ class ItemRepository {
         syncList(false)
         return liveItemsList.value!!.firstOrNull { id == it.id }
     }
+    fun deleteItem(itemId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            isRefreshing.postValue(true)
+            try {
+                val itemDeleteResponse = retrofitService.deleteItemAsync(CredentialsHolder.userId!!, itemId).await()
+                if (itemDeleteResponse.isSuccessful) {
+                    val copyList = liveItemsList.value!!.filter{ itemId != it.id }
+                    liveItemsList.postValue(copyList)
+                }
+            } catch (e: HttpException) {
+                //toastMessage = "Exception ${e.message}"
+
+            } catch (e: Throwable) {
+                //toastMessage = "Exception ${e.message}"
+            }
+            isRefreshing.postValue(false)
+        }
+    }
 
     fun syncList(force: Boolean) {
         if (liveItemsList.value.isNullOrEmpty() or force) {
