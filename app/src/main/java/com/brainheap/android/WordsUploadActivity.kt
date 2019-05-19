@@ -3,6 +3,7 @@ package com.brainheap.android
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.ui.wordsupload.WordsUploadFragment
 import com.brainheap.android.ui.wordsupload.WordsUploadViewModel
@@ -32,14 +33,15 @@ class WordsUploadActivity : AppCompatActivity() {
         when {
             intent?.action == Intent.ACTION_SEND -> {
                 val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
-                viewModel.init(text.toString())
+                viewModel.init(getUserId(), text.toString())
             }
             intent?.action == Intent.ACTION_PROCESS_TEXT -> {
                 val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
-                viewModel.init(text.toString())
+                viewModel.init(getUserId(), text.toString())
             }
         }
 
     }
 
+    private fun getUserId(): String? = PreferenceManager.getDefaultSharedPreferences(this).getString(Constants.ID_PROP, "")
 }

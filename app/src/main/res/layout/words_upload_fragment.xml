@@ -12,13 +12,23 @@
     <ScrollView
             android:layout_width="fill_parent"
             android:layout_weight="1"
-            android:layout_height="0dp">
+            android:layout_height="346dp">
         <TextView
                 android:text="TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/selectedTextView1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="36sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="26sp"
         />
+    </ScrollView>
+
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="70dp">
+        <TextView
+                android:text="TranslatedTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/translatedTextView" android:textSize="22sp"/>
     </ScrollView>
 
     <RelativeLayout
