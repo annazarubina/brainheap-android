@@ -1,8 +1,12 @@
 package com.brainheap.android.ui.worddetail
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Html.FROM_HTML_MODE_LEGACY
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +36,6 @@ class WordDetailFragment : Fragment() {
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -49,10 +52,29 @@ class WordDetailFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_word_detail, container, false)
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val itemId =  WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
-        word_detail_text_view.text = ItemRepository.instance.getItem(itemId)?.description
+        val itemId = WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
+        word_detail_text_view.text = Html.fromHtml(getHtmlDescription(itemId), FROM_HTML_MODE_LEGACY)
+    }
+
+    private fun getHtmlDescription(itemId: String): String? {
+        val description = ItemRepository.instance.getItem(itemId)?.description
+        var descriptionContext = description
+        var descriptionTranslation: String? = null
+        description?.indexOf(TRANSLATION_SEPARATOR)
+            ?.takeIf { it > 0 && it < description.length - TRANSLATION_SEPARATOR.length }?.let {
+            descriptionContext = description.substring(0, it)
+            descriptionTranslation = description.substring(it + TRANSLATION_SEPARATOR.length, description.length)
+        }
+        ItemRepository.instance.getItem(itemId)?.title
+            ?.split(" ")
+            ?.forEach { it -> descriptionContext = descriptionContext?.replace(it, "<i><b>$it</b></i>") }
+        return descriptionTranslation
+            ?.let{ descriptionContext
+                ?.let {"$descriptionContext<br><br><i><small>$descriptionTranslation</small><i>"} }
+            ?: descriptionContext
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -91,6 +113,9 @@ class WordDetailFragment : Fragment() {
     }
 
     companion object {
+        @JvmStatic
+        private val TRANSLATION_SEPARATOR = "///"
+
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.

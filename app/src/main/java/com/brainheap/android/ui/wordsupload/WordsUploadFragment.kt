@@ -35,7 +35,7 @@ import java.util.*
 class WordsUploadFragment : Fragment() {
 
     companion object {
-        val textColor = 0xFF0D47A1.toInt()
+        val textColor = 0x80000000.toInt()
         val pickedTextColor = 0xFF82B1FF.toInt()
         fun newInstance() = WordsUploadFragment()
     }
@@ -128,7 +128,7 @@ class WordsUploadFragment : Fragment() {
                                             .toLowerCase()
                                     }
                                     .joinToString(" ") { it },
-                                wordsContext.context + translatedText?.let { " /// $translatedText" }
+                                wordsContext.context + (translatedText?.let { " /// $translatedText" }?: "")
                             )
                         )
                     val createItemResponse = createItemRequest.await()

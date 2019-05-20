@@ -28,7 +28,10 @@
         <TextView
                 android:text="TranslatedTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/translatedTextView" android:textSize="22sp"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/translatedTextView"
+                android:textSize="16sp"
+                android:textStyle="italic"/>
     </ScrollView>
 
     <RelativeLayout
