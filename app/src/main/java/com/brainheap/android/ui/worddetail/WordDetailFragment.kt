@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import com.brainheap.android.R
 import com.brainheap.android.repository.ItemRepository
 import kotlinx.android.synthetic.main.fragment_word_detail.*
+import java.util.regex.Pattern
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -65,15 +66,23 @@ class WordDetailFragment : Fragment() {
         var descriptionTranslation: String? = null
         description?.indexOf(TRANSLATION_SEPARATOR)
             ?.takeIf { it > 0 && it < description.length - TRANSLATION_SEPARATOR.length }?.let {
-            descriptionContext = description.substring(0, it)
-            descriptionTranslation = description.substring(it + TRANSLATION_SEPARATOR.length, description.length)
-        }
+                descriptionContext = description.substring(0, it)
+                descriptionTranslation = description.substring(it + TRANSLATION_SEPARATOR.length, description.length)
+            }
         ItemRepository.instance.getItem(itemId)?.title
             ?.split(" ")
-            ?.forEach { it -> descriptionContext = descriptionContext?.replace(it, "<i><b>$it</b></i>") }
+            ?.forEach { it ->
+                val pattern = Pattern.compile("(?i)$it")
+                val matcher = pattern.matcher(descriptionContext)
+                while (matcher.find()) {
+                    descriptionContext = descriptionContext!!.substring(0, matcher.start()) + "<i><b>" + matcher.group() + "</b></i>" + descriptionContext!!.substring(matcher.end(), descriptionContext!!.length)
+                }
+            }
         return descriptionTranslation
-            ?.let{ descriptionContext
-                ?.let {"$descriptionContext<br><br><i><small>$descriptionTranslation</small><i>"} }
+            ?.let {
+                descriptionContext
+                    ?.let { "$descriptionContext<br><br><i><small>$descriptionTranslation</small><i>" }
+            }
             ?: descriptionContext
     }
 
