@@ -20,6 +20,12 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="26sp"
         />
     </ScrollView>
+    <CheckBox
+            android:id="@+id/show_translated_text_checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Translate"/>
 
     <ScrollView
             android:layout_width="wrap_content"

@@ -1,6 +1,7 @@
 package com.brainheap.android
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -33,15 +34,15 @@ class WordsUploadActivity : AppCompatActivity() {
         when {
             intent?.action == Intent.ACTION_SEND -> {
                 val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
-                viewModel.init(getUserId(), text.toString())
+                viewModel.init(text.toString(), getSharedPreferences())
             }
             intent?.action == Intent.ACTION_PROCESS_TEXT -> {
                 val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
-                viewModel.init(getUserId(), text.toString())
+                viewModel.init(text.toString(), getSharedPreferences())
             }
         }
 
     }
 
-    private fun getUserId(): String? = PreferenceManager.getDefaultSharedPreferences(this).getString(Constants.ID_PROP, "")
+    private fun getSharedPreferences(): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 }

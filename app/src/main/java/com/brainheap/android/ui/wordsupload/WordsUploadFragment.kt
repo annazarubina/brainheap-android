@@ -1,5 +1,6 @@
 package com.brainheap.android.ui.wordsupload
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.ViewModelProviders
@@ -13,11 +14,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.brainheap.android.Constants.ID_PROP
 import com.brainheap.android.Constants.NAME_PROP
+import com.brainheap.android.Constants.SHOW_TRANSALTION
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.model.UserView
@@ -43,6 +46,7 @@ class WordsUploadFragment : Fragment() {
     private lateinit var viewModel: WordsUploadViewModel
     private var selectedTextView: TextView? = null
     private var translatedTextView: TextView? = null
+    private var showTranslatedTextCheckBox: CheckBox? = null
 
     private val retrofitService = RetrofitFactory.makeRetrofitService()
 
@@ -97,11 +101,18 @@ class WordsUploadFragment : Fragment() {
             if (it) activity!!.finish()
         })
 
+        viewModel.showTranslatedText.observe(this, Observer<Boolean> {
+            showTranslatedTextCheckBox?.isChecked = it
+        })
+
+        viewModel.translatedText.observe(this, Observer<String> {
+            translatedTextView?.text = it
+        })
+
         send_to_server_button.setOnClickListener {
             val wordsContext = viewModel.wordContext.value
             val translatedText = viewModel.translatedText.value
-            val userId = getUserId()
-            if (userId.isNullOrEmpty()) {
+            if (viewModel.userId.value.isNullOrEmpty()) {
                 Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -116,7 +127,7 @@ class WordsUploadFragment : Fragment() {
                 try {
                     val createItemRequest = retrofitService
                         .createItemAsync(
-                            userId,
+                            viewModel.userId.value!!,
                             ItemView(
                                 wordsContext.wordList
                                     .filter { it.pickedTime.value != null }
@@ -152,19 +163,19 @@ class WordsUploadFragment : Fragment() {
                 }
             }
         }
-        translatedTextView?.text = viewModel.translatedText.value
+        show_translated_text_checkBox.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setShowTranslatedText(isChecked)
+        }
     }
 
     private fun initControls() {
         selectedTextView = activity?.findViewById(R.id.selectedTextView1)
         translatedTextView = activity?.findViewById(R.id.translatedTextView)
+        showTranslatedTextCheckBox = activity?.findViewById(R.id.show_translated_text_checkBox)
         selectedTextView?.movementMethod = LinkMovementMethod.getInstance()
         selectedTextView?.highlightColor = resources.getColor(android.R.color.transparent, resources.newTheme())
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(WordsUploadViewModel::class.java)
         }
     }
-
-    private fun getUserId(): String? = PreferenceManager.getDefaultSharedPreferences(activity).getString(ID_PROP, "")
-
 }

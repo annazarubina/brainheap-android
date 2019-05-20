@@ -1,9 +1,13 @@
 package com.brainheap.android.ui.wordsupload
 
+import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.brainheap.android.Constants
+import com.brainheap.android.Constants.ID_PROP
+import com.brainheap.android.Constants.SHOW_TRANSALTION
 import com.brainheap.android.network.RetrofitFactory
 import com.google.common.net.UrlEscapers
 import kotlinx.coroutines.CoroutineScope
@@ -17,12 +21,21 @@ data class WordsContext(val context: String, val wordList: List<Word>)
 class WordsUploadViewModel : ViewModel() {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
 
+    val userId = MutableLiveData<String>()
     val wordContext = MutableLiveData<WordsContext>()
     val itemSaved = MutableLiveData<Boolean>(false)
+    val showTranslatedText = MutableLiveData<Boolean>(true)
     val translatedText = MutableLiveData<String>()
+    var cachedTranslatedText: String? = null
+    var sharedPreferences: SharedPreferences? = null
 
-    fun init(userId: String?, ctxStr: String) {
+    fun init(ctxStr: String, sharedPreferences: SharedPreferences) {
         if (wordContext.value?.context == ctxStr) return
+        this.sharedPreferences = sharedPreferences
+        userId.value = sharedPreferences.getString(ID_PROP, "")
+        showTranslatedText.value = sharedPreferences.getBoolean(SHOW_TRANSALTION, true)
+        translatedText.value = ""
+
         val wordList = ArrayList<Word>()
         val spaceList = ArrayList<Int>()
         spaceList.add(-1)
@@ -37,21 +50,7 @@ class WordsUploadViewModel : ViewModel() {
             }
         }
         wordContext.value = WordsContext(ctxStr, wordList)
-        if (!ctxStr.isNullOrEmpty() && !userId.isNullOrEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val request = retrofitService
-                        .translateAsync(userId, "\"" + ctxStr + "\"")
-                    val response = request.await()
-                    if (response.isSuccessful) {
-                        translatedText.postValue(response.body())
-
-                    }
-                } catch (e: Throwable) {
-                    "Error: ${e.message}"
-                }
-            }
-        }
+        updateTranslatedText()
     }
 
     private fun setWordContext(ctxStr: String) {
@@ -71,21 +70,36 @@ class WordsUploadViewModel : ViewModel() {
         }
     }
 
-    private fun setTranslatedText(userId: String?, ctxStr: String) {
-        if (!ctxStr.isNullOrEmpty() && !userId.isNullOrEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val request = retrofitService
-                        .translateAsync(userId, UrlEscapers.urlFragmentEscaper().escape(ctxStr))
-                    val response = request.await()
-                    if (response.isSuccessful) {
-                        translatedText.value = response.body()
-
+    private fun updateTranslatedText() {
+        if (!wordContext.value?.context.isNullOrEmpty() && !userId.value.isNullOrEmpty() && showTranslatedText.value == true) {
+            cachedTranslatedText
+                ?.let { translatedText.postValue(cachedTranslatedText) }
+                ?: (CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val request = retrofitService
+                            .translateAsync(userId.value!!,"\"" + wordContext.value?.context!! + "\"")
+                        val response = request.await()
+                        if (response.isSuccessful) {
+                            cachedTranslatedText = response.body()
+                            translatedText.postValue(response.body())
+                        } else {
+                            translatedText.postValue("")
+                        }
+                    } catch (e: Throwable) {
+                        "Error: ${e.message}"
+                        translatedText.postValue("")
                     }
-                } catch (e: Throwable) {
-                    "Error: ${e.message}"
-                }
-            }
+                })
+        } else {
+            translatedText.postValue("")
         }
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    fun setShowTranslatedText(value: Boolean) {
+        if (showTranslatedText.value?.equals(value) == true) return
+        sharedPreferences!!.edit().putBoolean(SHOW_TRANSALTION, value).apply()
+        showTranslatedText.value = value
+        updateTranslatedText()
     }
 }
