@@ -25,13 +25,16 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".WordsEditUploadActivity"
+                  android:label="@string/process_text_action_name"
+                  android:launchMode="singleTop"
+                  android:theme="@style/WordsTransparent"/>
     </application>
 
 </manifest>

@@ -1,11 +1,8 @@
 package com.brainheap.android.ui.wordsupload
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Color
+import android.content.Intent
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
@@ -18,22 +15,16 @@ import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import com.brainheap.android.Constants.ID_PROP
-import com.brainheap.android.Constants.NAME_PROP
-import com.brainheap.android.Constants.SHOW_TRANSALTION
 import com.brainheap.android.R
+import com.brainheap.android.WordsEditUploadActivity
 import com.brainheap.android.model.ItemView
-import com.brainheap.android.model.UserView
 import com.brainheap.android.network.RetrofitFactory
-import com.google.common.net.UrlEscapers
 import kotlinx.android.synthetic.main.words_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.net.URLEncoder
-import java.util.*
 
 class WordsUploadFragment : Fragment() {
 
@@ -58,13 +49,12 @@ class WordsUploadFragment : Fragment() {
     }
 
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initControls()
 
         viewModel.translatedText.observe(this, Observer<String> {
-            translatedTextView?.text = it?:""
+            translatedTextView?.text = it ?: ""
         })
 
         viewModel.wordContext.observe(this, Observer<WordsContext> { wordsContext ->
@@ -109,6 +99,14 @@ class WordsUploadFragment : Fragment() {
             translatedTextView?.text = it
         })
 
+        edit_button.setOnClickListener {
+            val intent = Intent(this.context, WordsEditUploadActivity::class.java)
+            intent.putExtra ("title", extractTitle())
+            intent.putExtra ("description", viewModel.wordContext.value?.context )
+            intent.putExtra ("translation", viewModel.translatedText.value )
+            startActivity(intent)
+        }
+
         send_to_server_button.setOnClickListener {
             val wordsContext = viewModel.wordContext.value
             val translatedText = viewModel.translatedText.value
@@ -128,19 +126,7 @@ class WordsUploadFragment : Fragment() {
                     val createItemRequest = retrofitService
                         .createItemAsync(
                             viewModel.userId.value!!,
-                            ItemView(
-                                wordsContext.wordList
-                                    .filter { it.pickedTime.value != null }
-                                    .sortedBy { it.pickedTime.value }
-                                    .map { word ->
-                                        word.word
-                                            .dropWhile { !it.isLetterOrDigit() }
-                                            .dropLastWhile { !it.isLetterOrDigit() }
-                                            .toLowerCase()
-                                    }
-                                    .joinToString(" ") { it },
-                                wordsContext.context + (translatedText?.let { " /// $translatedText" }?: "")
-                            )
+                            ItemView( extractTitle()?:"", wordsContext.context + (translatedText?.let { " /// $translatedText" } ?: ""))
                         )
                     val createItemResponse = createItemRequest.await()
                     toastMessage = if (createItemResponse.isSuccessful) {
@@ -166,6 +152,20 @@ class WordsUploadFragment : Fragment() {
         show_translated_text_checkBox.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setShowTranslatedText(isChecked)
         }
+    }
+
+    private fun extractTitle() : String? {
+        return viewModel.wordContext.value
+            ?.wordList
+            ?.filter { it.pickedTime.value != null }
+            ?.sortedBy { it.pickedTime.value }
+            ?.map { word ->
+                word.word
+                    .dropWhile { !it.isLetterOrDigit() }
+                    .dropLastWhile { !it.isLetterOrDigit() }
+                    .toLowerCase()
+            }
+            ?.joinToString(" ") { it }
     }
 
     private fun initControls() {
