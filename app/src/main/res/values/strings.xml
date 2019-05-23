@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">Brain Heap</string>
+    <string name="app_name">brainheap</string>
     <string name="process_text_action_name">to BrainHeap</string>
     <string name="send_words_button_text">Send to server</string>
     <string name="edit_words_button_text">Edit</string>
-
+    <string name="facebook_app_id">840988416285901</string>
+    <string name="fb_login_protocol_scheme">fb840988416285901</string>
     <string-array name="items_time_array">
         <item>Today</item>
         <item>This week</item>
         <item>This month</item>
         <item>All</item>
     </string-array>
-
 </resources>

@@ -11,7 +11,7 @@ import retrofit2.http.*
 
 interface RetrofitService {
     @GET("/users")
-    fun findUserAsync(@Query("email") email: String): Deferred<Response<User>>
+    fun findUserAsync(@Query("email") email: String): Deferred<Response<List<User>>>
 
     @POST("/users")
     fun createUserAsync(@Body user: UserView): Deferred<Response<User>>

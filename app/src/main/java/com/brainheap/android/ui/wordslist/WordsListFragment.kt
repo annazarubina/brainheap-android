@@ -40,10 +40,10 @@ class WordsListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity!!)
-        val userId = sharedPref.getString(Constants.ID_PROP, "")
-        if (userId.isNullOrEmpty()) {
+//        val userId = sharedPref.getString(Constants.ID_PROP, "")
+        if (CredentialsHolder.userId.isNullOrEmpty()) {
             findNavController(this).navigate(R.id.action_force_login)
-        } else CredentialsHolder.userId = userId
+        }
 
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(WordsListViewModel::class.java)

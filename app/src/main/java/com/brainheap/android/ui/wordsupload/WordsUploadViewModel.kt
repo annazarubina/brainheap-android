@@ -26,8 +26,8 @@ class WordsUploadViewModel : ViewModel() {
     val itemSaved = MutableLiveData<Boolean>(false)
     val showTranslatedText = MutableLiveData<Boolean>(true)
     val translatedText = MutableLiveData<String>()
-    var cachedTranslatedText: String? = null
-    var sharedPreferences: SharedPreferences? = null
+    private var cachedTranslatedText: String? = null
+    private var sharedPreferences: SharedPreferences? = null
 
     fun init(ctxStr: String, sharedPreferences: SharedPreferences) {
         if (wordContext.value?.context == ctxStr) return
