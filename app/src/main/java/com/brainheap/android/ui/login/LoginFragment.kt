@@ -2,7 +2,6 @@ package com.brainheap.android.ui.login
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Credentials
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -32,6 +31,15 @@ import retrofit2.HttpException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInResult
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.tasks.Task
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
@@ -41,6 +49,7 @@ import java.util.*
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+private const val RC_SIGN_IN = 9001
 
 
 class LoginFragment : Fragment() {
@@ -52,12 +61,12 @@ class LoginFragment : Fragment() {
     private lateinit var viewModel: LoginViewModel
 
     private val callbackManager: CallbackManager = CallbackManager.Factory.create()
-    private val loginManager: LoginManager = LoginManager.getInstance()
+    private val fbLoginManager: LoginManager = LoginManager.getInstance()
 
     private val mapper = ObjectMapper()
 
     init {
-        loginManager.registerCallback(callbackManager,
+        fbLoginManager.registerCallback(callbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
                     Toast.makeText(activity, "Facebook token: " + loginResult.accessToken.token, Toast.LENGTH_SHORT)
@@ -130,8 +139,17 @@ class LoginFragment : Fragment() {
             viewModel.email.postValue(emailEditText.text.toString())
         }
 
-        login_button.setOnClickListener {
-            loginManager.logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
+        fb_login_button.setOnClickListener {
+            fbLoginManager.logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
+        }
+        google_login_button.setOnClickListener {
+            val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build()
+            val googleSignInClient = GoogleSignIn.getClient(activity!!, googleSignInOptions)
+            val signInIntent : Intent = googleSignInClient.signInIntent
+            startActivityForResult(signInIntent, RC_SIGN_IN)
         }
     }
 
@@ -196,7 +214,7 @@ class LoginFragment : Fragment() {
                 }
                 toastMessage?.let {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(activity, "Error: $it", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "Facebook auth error: $it", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -205,9 +223,24 @@ class LoginFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        callbackManager.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            onGoogleActivityResult(data!!)
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
+    private fun onGoogleActivityResult(data: Intent) {
+        var toastMessage : String? = null
+        try {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account: GoogleSignInAccount? = task.getResult(ApiException::class.java)
+            viewModel.email.postValue(account?.email)
+        } catch (e: ApiException) {
+            toastMessage = "Api exception. Error code: " + e.statusCode
+        }
+        toastMessage?.let { Toast.makeText(activity, "Google auth error: $it", Toast.LENGTH_SHORT).show() }
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     fun onButtonPressed(uri: Uri) {

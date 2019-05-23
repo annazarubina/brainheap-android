@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
+        val ssh = getSHA()
     }
 
     @SuppressLint("PackageManagerGetSignatures")
