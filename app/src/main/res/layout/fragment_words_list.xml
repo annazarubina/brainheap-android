@@ -18,6 +18,16 @@
             android:layout_marginBottom="16dp"
             materialdesign:layout_constraintBottom_toBottomOf="parent" materialdesign:backgroundTint="#1E88E5"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:src="@android:drawable/ic_input_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/words_list_add_button"
+            android:layout_marginStart="16dp"
+            materialdesign:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="16dp"
+            materialdesign:layout_constraintBottom_toBottomOf="parent" materialdesign:backgroundTint="#1E88E5"/>
+
     <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

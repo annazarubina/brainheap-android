@@ -2,6 +2,7 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".WordsEditUploadActivity"
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,20 +16,11 @@
         <EditText
                 android:text="TitleEditText"
                 android:layout_width="wrap_content"
+                android:minWidth="100dp"
+                android:minHeight="24dp"
+                android:background="@null"
                 android:layout_height="wrap_content" android:id="@+id/titleEditText"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="24sp"
-        />
-    </ScrollView>
-    <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-        <EditText
-                android:text="DescriptionEditText"
-                android:layout_width="wrap_content"
-                android:background="@null"
-                android:layout_height="wrap_content" android:id="@+id/descriptionEditText"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="20sp"
         />
     </ScrollView>
     <CheckBox
@@ -43,10 +35,26 @@
             android:layout_weight="1"
             android:layout_height="wrap_content">
         <EditText
+                android:text="DescriptionEditText"
+                android:minWidth="100dp"
+                android:minHeight="24dp"
+                android:background="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/descriptionEditText"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="20sp"
+        />
+    </ScrollView>
+    <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+        <EditText
                 android:text="TranslatedTextView"
+                android:minWidth="100dp"
+                android:minHeight="24dp"
+                android:background="@null"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
                 android:id="@+id/translatedEditText"
                 android:textSize="16sp"
                 android:textStyle="italic"/>

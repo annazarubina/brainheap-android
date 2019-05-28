@@ -1,5 +1,8 @@
 package com.brainheap.android.ui.wordslist
 
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -15,19 +18,16 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.brainheap.android.Constants
 import com.brainheap.android.CredentialsHolder
-import com.brainheap.android.R
+import com.brainheap.android.WordsEditUploadActivity
 import com.brainheap.android.repository.ItemsListPeriod
 import kotlinx.android.synthetic.main.fragment_words_list.*
-
-
+import androidx.core.content.ContextCompat.getSystemService
+import com.brainheap.android.ClipboardProcessor
+import com.brainheap.android.R
 
 class WordsListFragment : Fragment() {
-
-
     private lateinit var viewModel: WordsListViewModel
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +50,13 @@ class WordsListFragment : Fragment() {
         }
 
         words_list_refresh_button.setOnClickListener { viewModel.refresh() }
+        words_list_add_button.setOnClickListener {
+            val intent = Intent(this.context, WordsEditUploadActivity::class.java)
+            val clipboardItem = ClipboardProcessor(context!!).process()
+            intent.putExtra ("title", clipboardItem?.title?:"title")
+            intent.putExtra ("description", clipboardItem?.description?:"description" )
+            startActivity(intent)
+        }
         word_list_refresh.setOnRefreshListener { viewModel.refresh() }
 
         val adapter = WordsListAdapter {

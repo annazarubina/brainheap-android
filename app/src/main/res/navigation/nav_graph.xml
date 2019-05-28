@@ -10,6 +10,7 @@
                 app:destination="@id/wordDetailFragment"/>
         <action android:id="@+id/action_force_login" app:destination="@id/loginFragment"
                 app:popUpTo="@+id/wordsListFragment" app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_word_edit_upload" app:destination="@id/wordsEditUploadFragment"/>
     </fragment>
     <fragment android:id="@+id/WordsUploadActivity" android:name="com.brainheap.android.ui.wordsupload.WordsUploadFragment"
               android:label="words_upload_fragment" tools:layout="@layout/words_upload_fragment">
@@ -21,7 +22,8 @@
         <argument android:name="ItemId" app:argType="string"/>
     </fragment>
     <fragment android:id="@+id/wordsEditUploadFragment" android:name="com.brainheap.android.ui.wordseditupload.WordsEditUploadFragment"
-              android:label="words_edit_upload_fragment" tools:layout="@layout/words_edit_upload_fragment">
+              android:label="words_edit_upload_fragment" tools:layout="@layout/words_edit_upload_fragment"
+              android:gravity="center">
         <argument android:name="title" app:argType="string"/>
         <argument android:name="description" app:argType="string"/>
         <argument android:name="translation" app:argType="string"/>
