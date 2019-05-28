@@ -31,17 +31,19 @@ class WordsUploadActivity : AppCompatActivity() {
     }
 
     private fun handleIntent() {
-        when {
-            intent?.action == Intent.ACTION_SEND -> {
-                val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
-                viewModel.init(text.toString(), getSharedPreferences())
+        intent?.let{
+            when {
+                it.action == Intent.ACTION_SEND -> {
+                    it.getCharSequenceExtra(Intent.EXTRA_TEXT).toString()
+                }
+                it.action == Intent.ACTION_PROCESS_TEXT -> {
+                    it.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
+                }
+                else -> {
+                    it.extras?.getString("text")?:"Sample text"
+                }
             }
-            intent?.action == Intent.ACTION_PROCESS_TEXT -> {
-                val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
-                viewModel.init(text.toString(), getSharedPreferences())
-            }
-        }
-
+        }?.let{text -> viewModel.init(text, getSharedPreferences()) }
     }
 
     private fun getSharedPreferences(): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)

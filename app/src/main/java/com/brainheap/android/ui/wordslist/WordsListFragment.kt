@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_words_list.*
 import androidx.core.content.ContextCompat.getSystemService
 import com.brainheap.android.ClipboardProcessor
 import com.brainheap.android.R
+import com.brainheap.android.WordsUploadActivity
 
 class WordsListFragment : Fragment() {
     private lateinit var viewModel: WordsListViewModel
@@ -51,11 +52,18 @@ class WordsListFragment : Fragment() {
 
         words_list_refresh_button.setOnClickListener { viewModel.refresh() }
         words_list_add_button.setOnClickListener {
-            val intent = Intent(this.context, WordsEditUploadActivity::class.java)
-            val clipboardItem = ClipboardProcessor(context!!).process()
-            intent.putExtra ("title", clipboardItem?.title?:"title")
-            intent.putExtra ("description", clipboardItem?.description?:"description" )
-            startActivity(intent)
+            ClipboardProcessor(context!!).process()
+                ?.let{
+                    val intent = Intent(this.context, WordsUploadActivity::class.java)
+                    intent.putExtra ("text", it)
+                    startActivity(intent)
+                }
+                ?:let{
+                    val intent = Intent(this.context, WordsEditUploadActivity::class.java)
+                    intent.putExtra ("title", "title")
+                    intent.putExtra ("description", "description" )
+                    startActivity(intent)
+                }
         }
         word_list_refresh.setOnRefreshListener { viewModel.refresh() }
 
