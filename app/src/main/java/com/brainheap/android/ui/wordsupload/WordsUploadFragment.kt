@@ -1,5 +1,6 @@
 package com.brainheap.android.ui.wordsupload
 
+import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -27,6 +28,8 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class WordsUploadFragment : Fragment() {
+
+    private val EDIT_WORDS_REQUEST = 1  // The request code
 
     companion object {
         val textColor = 0x80000000.toInt()
@@ -104,7 +107,7 @@ class WordsUploadFragment : Fragment() {
             intent.putExtra ("title", extractTitle())
             intent.putExtra ("description", viewModel.wordContext.value?.context )
             intent.putExtra ("translation", viewModel.translatedText.value )
-            startActivity(intent)
+            startActivityForResult(intent, EDIT_WORDS_REQUEST)
         }
 
         send_to_server_button.setOnClickListener {
@@ -151,6 +154,14 @@ class WordsUploadFragment : Fragment() {
         }
         show_translated_text_checkBox.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setShowTranslatedText(isChecked)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == EDIT_WORDS_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                viewModel.itemSaved.postValue(true)
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.brainheap.android.ui.wordseditupload
 
+import android.app.Activity
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -59,7 +60,12 @@ class WordsEditUploadFragment : Fragment() {
         viewModel.translationText.observe(this, Observer<String> { translationEditText?.setText(it ?: "") })
         viewModel.showTranslation.observe(this, Observer<Boolean> { showTranslatedTextCheckBox?.isChecked = it })
 
-        viewModel.itemSaved.observe(this, Observer<Boolean> { if (it) activity!!.finish() })
+        viewModel.itemSaved.observe(this, Observer<Boolean> {
+            if (it) {
+                activity!!.setResult(Activity.RESULT_OK)
+                activity!!.finish()
+            }
+        })
 
         edit_send_to_server_button.setOnClickListener {
             val userId = viewModel.getUserId()
