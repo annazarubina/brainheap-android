@@ -57,33 +57,7 @@ class WordDetailFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val itemId = WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
-        word_detail_text_view.text = Html.fromHtml(getHtmlDescription(itemId), FROM_HTML_MODE_LEGACY)
-    }
-
-    private fun getHtmlDescription(itemId: String): String? {
-        val description = ItemRepository.instance.getItem(itemId)?.description
-        var descriptionContext = description
-        var descriptionTranslation: String? = null
-        description?.indexOf(TRANSLATION_SEPARATOR)
-            ?.takeIf { it > 0 && it < description.length - TRANSLATION_SEPARATOR.length }?.let {
-                descriptionContext = description.substring(0, it)
-                descriptionTranslation = description.substring(it + TRANSLATION_SEPARATOR.length, description.length)
-            }
-        ItemRepository.instance.getItem(itemId)?.title
-            ?.split(" ")
-            ?.forEach { it ->
-                val pattern = Pattern.compile("(?i)$it")
-                val matcher = pattern.matcher(descriptionContext)
-                while (matcher.find()) {
-                    descriptionContext = descriptionContext!!.substring(0, matcher.start()) + "<i><b>" + matcher.group() + "</b></i>" + descriptionContext!!.substring(matcher.end(), descriptionContext!!.length)
-                }
-            }
-        return descriptionTranslation
-            ?.let {
-                descriptionContext
-                    ?.let { "$descriptionContext<br><br><i><small>$descriptionTranslation</small><i>" }
-            }
-            ?: descriptionContext
+        word_detail_text_view.text = Html.fromHtml(HtmlTextBuilder(ItemRepository.instance.getItem(itemId)).process(), FROM_HTML_MODE_LEGACY)
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -122,9 +96,6 @@ class WordDetailFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
-        private val TRANSLATION_SEPARATOR = "///"
-
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
