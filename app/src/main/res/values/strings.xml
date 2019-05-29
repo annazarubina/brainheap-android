@@ -5,7 +5,7 @@
     <string name="edit_words_button_text">Edit</string>
     <string name="facebook_app_id">840988416285901</string>
     <string name="fb_login_protocol_scheme">fb840988416285901</string>
-    <string name="server_client_id">909562477964-82gneilv21fnjb1k42amk99tpgd2112m.apps.googleusercontent.com</string>
+    <string name="server_client_id">909562477964-e0f0ud5irdv8l2miiidgt9bnpbetnkcg.apps.googleusercontent.com</string>
     <string-array name="items_time_array">
         <item>Today</item>
         <item>This week</item>
