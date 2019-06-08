@@ -1,6 +1,6 @@
-package com.brainheap.android.login.authprovider.keycloak.di
+package com.brainheap.android.login.authprovider.keycloak.client
 
-import com.brainheap.android.config.KeycloakProperties.baseUrl
+import com.brainheap.android.config.KeycloakProperties
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -24,7 +24,7 @@ object KeycloakClientFactory {
             .create()
 
         client = Retrofit.Builder()
-            .baseUrl("$baseUrl/")
+            .baseUrl("${KeycloakProperties.baseUrl}/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build().create(KeycloakClient::class.java)

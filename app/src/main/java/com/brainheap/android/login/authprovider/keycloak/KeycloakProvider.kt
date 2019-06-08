@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import com.brainheap.android.BrainheapApp
 import com.brainheap.android.config.KeycloakProperties
 import com.brainheap.android.login.AuthProvider
-import com.brainheap.android.login.authprovider.keycloak.di.KeycloakClientFactory
+import com.brainheap.android.login.authprovider.keycloak.client.KeycloakClientFactory
 import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.ui.login.OAuthUserData
-import com.facebook.FacebookSdk.getApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +72,7 @@ class KeycloakProvider(data: AuthProgressData) : AuthProvider(data) {
             }
             toastMessage?.let {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(getApplicationContext(), "Error: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(BrainheapApp.applicationContext(), "Error: $it", Toast.LENGTH_LONG).show()
                 }
             }
         }

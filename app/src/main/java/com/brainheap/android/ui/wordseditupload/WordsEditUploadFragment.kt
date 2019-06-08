@@ -11,6 +11,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.RetrofitFactory
@@ -74,18 +75,18 @@ class WordsEditUploadFragment : Fragment() {
             val description = descriptionEditText?.editableText.toString()
             val translation = translationEditText?.editableText.toString()
             if (userId.isNullOrEmpty()) {
-                Toast.makeText(getApplicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
+                Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (title.isEmpty() || description.isEmpty()) {
                 Toast.makeText(
-                    getApplicationContext(),
+                    BrainheapApp.applicationContext(),
                     "Pick some words for title and description",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
             }
-            Toast.makeText(getApplicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
+            Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
 
             CoroutineScope(Dispatchers.IO).launch {
                 var toastMessage: String
@@ -112,7 +113,7 @@ class WordsEditUploadFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }

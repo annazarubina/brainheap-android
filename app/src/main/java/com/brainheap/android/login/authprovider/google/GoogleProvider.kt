@@ -1,13 +1,12 @@
 package com.brainheap.android.login.authprovider.google
 
-import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
+import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.login.AuthProvider
 import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.ui.login.OAuthUserData
-import com.facebook.FacebookSdk.getApplicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -46,7 +45,13 @@ class GoogleProvider(data: AuthProgressData) : AuthProvider(data) {
             toastMessage = "Api exception. Error code: " + e.statusCode
             data.onFailed()
         }
-        toastMessage?.let { Toast.makeText(getApplicationContext(), "Google auth error: $it", Toast.LENGTH_SHORT).show() }
+        toastMessage?.let {
+            Toast.makeText(
+                BrainheapApp.applicationContext(),
+                "Google auth error: $it",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun logout() {}

@@ -16,6 +16,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.model.ItemView
@@ -75,7 +76,7 @@ class WordsUploadFragment : Fragment() {
                         }
                         widget.invalidate()
                         Toast.makeText(
-                            getApplicationContext(), word.word,
+                            BrainheapApp.applicationContext(), word.word,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -116,14 +117,14 @@ class WordsUploadFragment : Fragment() {
             val wordsContext = viewModel.wordContext.value
             val translatedText = viewModel.translatedText.value
             if (viewModel.userId.value.isNullOrEmpty()) {
-                Toast.makeText(getApplicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
+                Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (!wordsContext!!.wordList.any { it.pickedTime.value != null }) {
-                Toast.makeText(getApplicationContext(), "Pick some words!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(BrainheapApp.applicationContext(), "Pick some words!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            Toast.makeText(getApplicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
+            Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
 
             CoroutineScope(Dispatchers.IO).launch {
                 var toastMessage: String
@@ -150,7 +151,7 @@ class WordsUploadFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }
