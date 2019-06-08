@@ -17,9 +17,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.brainheap.android.R
-import com.brainheap.android.WordsEditUploadActivity
+import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.ui.MainActivity
+import com.facebook.FacebookSdk.getApplicationContext
 import kotlinx.android.synthetic.main.words_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +75,7 @@ class WordsUploadFragment : Fragment() {
                         }
                         widget.invalidate()
                         Toast.makeText(
-                            activity, word.word,
+                            getApplicationContext(), word.word,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -114,14 +116,14 @@ class WordsUploadFragment : Fragment() {
             val wordsContext = viewModel.wordContext.value
             val translatedText = viewModel.translatedText.value
             if (viewModel.userId.value.isNullOrEmpty()) {
-                Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
+                Toast.makeText(getApplicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (!wordsContext!!.wordList.any { it.pickedTime.value != null }) {
-                Toast.makeText(activity!!.applicationContext, "Pick some words!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(getApplicationContext(), "Pick some words!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            Toast.makeText(activity!!.applicationContext, "Trying to create item", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
 
             CoroutineScope(Dispatchers.IO).launch {
                 var toastMessage: String
@@ -148,7 +150,7 @@ class WordsUploadFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(activity!!.applicationContext, toastMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }

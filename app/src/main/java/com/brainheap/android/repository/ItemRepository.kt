@@ -2,7 +2,7 @@ package com.brainheap.android.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.brainheap.android.CredentialsHolder
+import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.model.Item
 import com.brainheap.android.network.RetrofitFactory
 import kotlinx.coroutines.CoroutineScope
@@ -10,8 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 enum class ItemsListPeriod(idx: Int){

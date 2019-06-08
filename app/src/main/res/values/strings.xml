@@ -5,11 +5,17 @@
     <string name="edit_words_button_text">Edit</string>
     <string name="facebook_app_id">840988416285901</string>
     <string name="fb_login_protocol_scheme">fb840988416285901</string>
-    <string name="server_client_id">909562477964-e0f0ud5irdv8l2miiidgt9bnpbetnkcg.apps.googleusercontent.com</string>
+    <string name="google_app_id">909562477964-e0f0ud5irdv8l2miiidgt9bnpbetnkcg.apps.googleusercontent.com</string>
     <string-array name="items_time_array">
         <item>Today</item>
         <item>This week</item>
         <item>This month</item>
         <item>All</item>
     </string-array>
+
+    <string name="keycloak_client_id">android-client</string>
+    <string name="keycloak_client_Secret">cc230cf1-11fc-40c8-bacb-b12a6e85a67c</string>
+    <string name="keycloak_base_url">https://brainheap-keycloak.herokuapp.com/auth/realms/brainheap/protocol/openid-connect</string>
+    <string name="keycloak_auth_code_endpoint">auth</string>
+    <string name="keycloak_redirect_url">com.brainheap.android://oauthresponse</string>
 </resources>

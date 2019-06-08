@@ -1,12 +1,11 @@
-package com.brainheap.android
+package com.brainheap.android.ui.wordseditupload
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProviders
-import com.brainheap.android.ui.wordseditupload.WordsEditUploadFragment
-import com.brainheap.android.ui.wordseditupload.WordsEditUploadViewModel
+import com.brainheap.android.R
 
 class WordsEditUploadActivity : AppCompatActivity() {
 

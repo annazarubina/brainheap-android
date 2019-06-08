@@ -1,4 +1,4 @@
-package com.brainheap.android
+package com.brainheap.android.ui
 
 import android.content.ClipboardManager
 import android.content.Context

@@ -2,14 +2,11 @@ package com.brainheap.android.ui.wordsupload
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.brainheap.android.Constants
-import com.brainheap.android.Constants.ID_PROP
-import com.brainheap.android.Constants.SHOW_TRANSALTION
+import com.brainheap.android.preferences.Constants.ID_PROP
+import com.brainheap.android.preferences.Constants.SHOW_TRANSALTION
 import com.brainheap.android.network.RetrofitFactory
-import com.google.common.net.UrlEscapers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.RetrofitFactory
+import com.facebook.FacebookSdk.getApplicationContext
 import kotlinx.android.synthetic.main.words_edit_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,18 +74,18 @@ class WordsEditUploadFragment : Fragment() {
             val description = descriptionEditText?.editableText.toString()
             val translation = translationEditText?.editableText.toString()
             if (userId.isNullOrEmpty()) {
-                Toast.makeText(activity!!.applicationContext, "User is not registered", Toast.LENGTH_SHORT).show()
+                Toast.makeText(getApplicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (title.isEmpty() || description.isEmpty()) {
                 Toast.makeText(
-                    activity!!.applicationContext,
+                    getApplicationContext(),
                     "Pick some words for title and description",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
             }
-            Toast.makeText(activity!!.applicationContext, "Trying to create item", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
 
             CoroutineScope(Dispatchers.IO).launch {
                 var toastMessage: String
@@ -92,7 +93,7 @@ class WordsEditUploadFragment : Fragment() {
                     val createItemRequest = retrofitService
                         .createItemAsync(
                             userId,
-                            ItemView(title, description + (translation?.let { " /// $translation" } ?: ""))
+                            ItemView(title, description + translation.let { " /// $translation" })
                         )
                     val createItemResponse = createItemRequest.await()
                     toastMessage = if (createItemResponse.isSuccessful) {
@@ -111,7 +112,7 @@ class WordsEditUploadFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(activity!!.applicationContext, toastMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }

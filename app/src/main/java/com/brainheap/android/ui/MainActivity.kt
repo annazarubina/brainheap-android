@@ -1,4 +1,4 @@
-package com.brainheap.android
+package com.brainheap.android.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -7,6 +7,7 @@ import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import android.content.pm.PackageManager
 import android.util.Base64
+import com.brainheap.android.R
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 

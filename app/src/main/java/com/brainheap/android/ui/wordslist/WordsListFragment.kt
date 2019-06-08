@@ -1,9 +1,6 @@
 package com.brainheap.android.ui.wordslist
 
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
@@ -18,14 +15,14 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.brainheap.android.CredentialsHolder
-import com.brainheap.android.WordsEditUploadActivity
+import com.brainheap.android.preferences.CredentialsHolder
+import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.repository.ItemsListPeriod
 import kotlinx.android.synthetic.main.fragment_words_list.*
-import androidx.core.content.ContextCompat.getSystemService
-import com.brainheap.android.ClipboardProcessor
+import com.brainheap.android.ui.ClipboardProcessor
+import com.brainheap.android.ui.login.LoginActivity
 import com.brainheap.android.R
-import com.brainheap.android.WordsUploadActivity
+import com.brainheap.android.ui.wordsupload.WordsUploadActivity
 
 class WordsListFragment : Fragment() {
     private lateinit var viewModel: WordsListViewModel
@@ -40,10 +37,8 @@ class WordsListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity!!)
-//        val userId = sharedPref.getString(Constants.ID_PROP, "")
         if (CredentialsHolder.userId.isNullOrEmpty()) {
-            findNavController(this).navigate(R.id.action_force_login)
+            startActivity(Intent(context, LoginActivity::class.java))
         }
 
         activity?.let {

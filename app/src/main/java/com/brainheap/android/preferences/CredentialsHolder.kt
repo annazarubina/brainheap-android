@@ -1,4 +1,4 @@
-package com.brainheap.android
+package com.brainheap.android.preferences
 
 object CredentialsHolder {
     var userId: String? = null

@@ -8,7 +8,7 @@
               android:label="fragment_words_list" tools:layout="@layout/fragment_words_list">
         <action android:id="@+id/action_view_word_detail"
                 app:destination="@id/wordDetailFragment"/>
-        <action android:id="@+id/action_force_login" app:destination="@id/loginFragment"
+        <action android:id="@+id/action_force_login" app:destination="@id/login_activity"
                 app:popUpTo="@+id/wordsListFragment" app:popUpToInclusive="true"/>
         <action android:id="@+id/action_word_edit_upload" app:destination="@id/wordsEditUploadFragment"/>
     </fragment>
@@ -28,9 +28,8 @@
         <argument android:name="description" app:argType="string"/>
         <argument android:name="translation" app:argType="string"/>
     </fragment>
-    <fragment android:id="@+id/loginFragment" android:name="com.brainheap.android.ui.login.LoginFragment"
+    <fragment android:id="@+id/login_activity" android:name="com.brainheap.android.ui.login.LoginActivity"
               android:label="fragment_login" tools:layout="@layout/fragment_login">
-        <action android:id="@+id/action_logged_in" app:destination="@id/wordsListFragment"
-                app:popUpTo="@+id/loginFragment" app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_logged_in" app:destination="@id/wordsListFragment"/>
     </fragment>
 </navigation>

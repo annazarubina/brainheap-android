@@ -1,4 +1,4 @@
-package com.brainheap.android
+package com.brainheap.android.ui.wordsupload
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -6,8 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProviders
-import com.brainheap.android.ui.wordsupload.WordsUploadFragment
-import com.brainheap.android.ui.wordsupload.WordsUploadViewModel
+import com.brainheap.android.R
 
 class WordsUploadActivity : AppCompatActivity() {
 

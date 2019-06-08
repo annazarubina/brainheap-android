@@ -3,6 +3,7 @@
           package="com.brainheap.android">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
+            android:name=".BrainheapApp"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="Brain Heap"
@@ -10,7 +11,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme.BrainHeap">
         <activity
-                android:name=".WordsUploadActivity"
+                android:name=".ui.wordsupload.WordsUploadActivity"
                 android:label="@string/process_text_action_name"
                 android:launchMode="singleTop"
                 android:theme="@style/WordsTransparent">
@@ -25,13 +26,22 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.login.LoginActivity" android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="com.brainheap.android" android:host="oauthresponse"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <data android:scheme="com.brainheap.android" android:host="oauthresponse"/>
             </intent-filter>
         </activity>
-        <activity android:name=".WordsEditUploadActivity"
+        <activity android:name=".ui.wordseditupload.WordsEditUploadActivity"
                   android:label="@string/process_text_action_name"
                   android:launchMode="singleTop"
                   android:theme="@style/WordsTransparent"/>

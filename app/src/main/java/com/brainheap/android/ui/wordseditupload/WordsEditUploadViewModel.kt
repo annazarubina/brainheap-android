@@ -4,13 +4,12 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.brainheap.android.Constants.ID_PROP
-import com.brainheap.android.Constants.SHOW_TRANSALTION
+import com.brainheap.android.preferences.Constants.ID_PROP
+import com.brainheap.android.preferences.Constants.SHOW_TRANSALTION
 import com.brainheap.android.network.RetrofitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 class WordsEditUploadViewModel : ViewModel() {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
