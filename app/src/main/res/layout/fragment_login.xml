@@ -7,6 +7,15 @@
         android:layout_height="match_parent"
         android:id="@+id/login_activity"
         tools:context=".ui.login.LoginActivity">
+    <ProgressBar
+            android:id="@+id/loadingSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="150dp"
+            android:padding="10dp"/>
     <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

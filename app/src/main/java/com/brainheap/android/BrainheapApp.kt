@@ -10,6 +10,7 @@ class BrainheapApp : Application() {
     }
 
     companion object {
+        @JvmStatic
         private var instance: BrainheapApp? = null
 
         fun applicationContext() : Context {

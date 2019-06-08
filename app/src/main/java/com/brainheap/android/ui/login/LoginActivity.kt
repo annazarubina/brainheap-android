@@ -3,6 +3,8 @@ package com.brainheap.android.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -47,9 +49,16 @@ class LoginActivity : AppCompatActivity() {
         })
 
         providerManager.data.inProgress.observe(this, Observer { inProgress ->
-            inProgress.takeIf { it == false }
-                .let { providerManager.data.oAuthData.value }
-                ?.let { getUserId(it.email) }
+            if(inProgress) {
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                loadingSpinner.visibility = View.VISIBLE
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                providerManager.data.oAuthData.value?.let { getUserId(it.email) }
+                loadingSpinner.visibility = View.GONE
+            }
         })
 
         viewModel.email.observe(this, Observer {
