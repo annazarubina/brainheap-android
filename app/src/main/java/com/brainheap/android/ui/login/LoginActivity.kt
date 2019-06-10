@@ -26,7 +26,7 @@ import retrofit2.HttpException
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
-    private val providerManager = AuthProviderManager()
+    private val providerManager = AuthProviderManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +56,9 @@ class LoginActivity : AppCompatActivity() {
                 loadingSpinner.visibility = View.VISIBLE
             } else {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                providerManager.data.oAuthData.value?.let { getUserId(it.email) }
+                providerManager.data.oAuthData.value?.let {
+                    viewModel.email.postValue(it.email)
+                }
                 loadingSpinner.visibility = View.GONE
             }
         })
@@ -70,7 +72,8 @@ class LoginActivity : AppCompatActivity() {
         emailEditText.setText(mail)
 
         viewModel.userId.observe(this, Observer {
-            CredentialsHolder.userId = it
+            CredentialsHolder.userId.postValue(it)
+            CredentialsHolder.email.postValue(viewModel.email.value)
             sharedPref.edit().putString(Constants.ID_PROP, it).apply()
             viewModel.loginSuccess.postValue(true)
         })
@@ -90,8 +93,6 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, intent)
         providerManager.get().onLoginActivityResult(requestCode, resultCode, intent)
     }
-
-    override fun onBackPressed() {}
 
     private fun getUserId(email: String?) {
         email?.let {

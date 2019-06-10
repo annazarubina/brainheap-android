@@ -6,7 +6,7 @@ import com.brainheap.android.login.authprovider.google.GoogleProvider
 import com.brainheap.android.login.authprovider.keycloak.KeycloakProvider
 import com.brainheap.android.login.data.AuthProgressData
 
-class AuthProviderManager {
+object AuthProviderManager {
     private var active = AuthProvider.Type.KEYCLOAK_SERVER
     private var providers: MutableMap<AuthProvider.Type, AuthProvider> = HashMap()
     val data: AuthProgressData = AuthProgressData()

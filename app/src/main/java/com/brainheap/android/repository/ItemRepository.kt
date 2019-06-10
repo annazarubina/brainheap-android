@@ -1,10 +1,11 @@
 package com.brainheap.android.repository
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.model.Item
 import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.preferences.CredentialsHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,7 +13,7 @@ import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class ItemsListPeriod(idx: Int){
+enum class ItemsListPeriod(idx: Int) {
     TODAY(0),
     THIS_WEEK(1),
     THIS_MONTH(2),
@@ -21,7 +22,7 @@ enum class ItemsListPeriod(idx: Int){
 
 class ItemRepository {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
-    private val liveItemsList =  MutableLiveData<List<Item>>(emptyList())
+    private val liveItemsList = MutableLiveData<List<Item>>(emptyList())
     private val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.TODAY)
     val isRefreshing = MutableLiveData<Boolean>(false)
 
@@ -42,51 +43,58 @@ class ItemRepository {
         return liveItemsList.value!!.firstOrNull { id == it.id }
     }
 
-    fun getPeriod() : LiveData<ItemsListPeriod> {
+    fun getPeriod(): LiveData<ItemsListPeriod> {
         return period
     }
 
     fun deleteItem(itemId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            isRefreshing.postValue(true)
-            try {
-                val itemDeleteResponse = retrofitService.deleteItemAsync(CredentialsHolder.userId!!, itemId).await()
-                if (itemDeleteResponse.isSuccessful) {
-                    val copyList = liveItemsList.value!!.filter{ itemId != it.id }
-                    liveItemsList.postValue(copyList)
-                }
-            } catch (e: HttpException) {
-                //toastMessage = "Exception ${e.message}"
+        CredentialsHolder.userId.value?.takeIf { it.isNotEmpty() }?.let {
+            CoroutineScope(Dispatchers.IO).launch {
+                isRefreshing.postValue(true)
+                try {
+                    val itemDeleteResponse = retrofitService.deleteItemAsync(it, itemId).await()
+                    if (itemDeleteResponse.isSuccessful) {
+                        val copyList = liveItemsList.value!!.filter { itemId != it.id }
+                        liveItemsList.postValue(copyList)
+                    }
+                } catch (e: HttpException) {
+                    //toastMessage = "Exception ${e.message}"
 
-            } catch (e: Throwable) {
-                //toastMessage = "Exception ${e.message}"
+                } catch (e: Throwable) {
+                    //toastMessage = "Exception ${e.message}"
+                }
+                isRefreshing.postValue(false)
             }
-            isRefreshing.postValue(false)
         }
     }
 
     fun syncList(force: Boolean) {
         if (liveItemsList.value.isNullOrEmpty() or force) {
-            CoroutineScope(Dispatchers.IO).launch {
-                isRefreshing.postValue(true)
-                try {
-                    val query = queryFromPeriod(period.value!!)
-                    val itemListResponse = retrofitService.findItemsAsync(CredentialsHolder.userId!!,query).await()
-                    if (itemListResponse.isSuccessful) {
-                        liveItemsList.postValue(itemListResponse.body())
-                    }
-                }  catch (e: HttpException) {
-                    //toastMessage = "Exception ${e.message}"
+            CredentialsHolder.userId.value?.takeIf { it.isNotEmpty() }?.let {
+                CoroutineScope(Dispatchers.IO).launch {
+                    isRefreshing.postValue(true)
+                    try {
+                        val query = queryFromPeriod(period.value!!)
+                        val itemListResponse = retrofitService.findItemsAsync(it, query).await()
+                        if (itemListResponse.isSuccessful) {
+                            liveItemsList.postValue(itemListResponse.body())
+                        }
+                    } catch (e: HttpException) {
+                        //toastMessage = "Exception ${e.message}"
 
-                } catch (e: Throwable) {
-                    "Exception ${e.message}"
+                    } catch (e: Throwable) {
+                        "Exception ${e.message}"
+                    }
+                    isRefreshing.postValue(false)
                 }
-                isRefreshing.postValue(false)
+            } ?: let {
+                liveItemsList.postValue(Collections.emptyList())
             }
         }
-
     }
 
+
+    @SuppressLint("SimpleDateFormat")
     private fun queryFromPeriod(queryPeriod: ItemsListPeriod): String? {
         val calendar = Calendar.getInstance()
         calendar.clear(Calendar.MINUTE)
@@ -114,7 +122,5 @@ class ItemRepository {
 
     companion object {
         val instance = ItemRepository()
-
     }
-
 }

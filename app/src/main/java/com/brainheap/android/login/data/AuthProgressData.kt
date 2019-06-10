@@ -21,4 +21,9 @@ class AuthProgressData {
         oAuthData.postValue(null)
         inProgress.postValue(false)
     }
+
+    fun clean() {
+        oAuthData.postValue(null)
+        inProgress.postValue(false)
+    }
 }

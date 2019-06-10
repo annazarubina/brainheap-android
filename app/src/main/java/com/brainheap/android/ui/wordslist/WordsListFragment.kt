@@ -26,6 +26,7 @@ import com.brainheap.android.ui.wordsupload.WordsUploadActivity
 
 class WordsListFragment : Fragment() {
     private lateinit var viewModel: WordsListViewModel
+    private var baseTitle: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,7 +38,10 @@ class WordsListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (CredentialsHolder.userId.isNullOrEmpty()) {
+
+        baseTitle?:let{ activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
+
+        if (CredentialsHolder.userId.value.isNullOrEmpty()) {
             startActivity(Intent(context, LoginActivity::class.java))
         }
 
@@ -82,7 +86,10 @@ class WordsListFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(words_list_recyclerView)
 
-        //Observe changes
+        CredentialsHolder.email.observe(this, Observer { email ->
+            activity?.title = email?.takeIf { it.isNotEmpty() }?.let{ "$baseTitle ($it)" } ?:baseTitle
+        })
+
         viewModel.liveDataItemList.observe(this, Observer {
             adapter.loadItems(it ?: emptyList())
             adapter.notifyDataSetChanged()
@@ -90,7 +97,6 @@ class WordsListFragment : Fragment() {
         viewModel.isRefreshing.observe(this, Observer {
             word_list_refresh.isRefreshing = it })
 
-        //Setup spinner
         ArrayAdapter.createFromResource(
             activity,
             R.array.items_time_array,

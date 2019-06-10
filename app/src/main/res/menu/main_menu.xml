@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+            android:id="@+id/action_search"
+            android:icon="@drawable/com_facebook_button_like_icon_selected"
+            android:title="Search"
+            app:showAsAction="always" />
+    <item
+            android:id="@+id/action_profile"
+            android:title="Profile" />
+    <item
+            android:id="@+id/action_log_out"
+            android:title="Log out" />
+    <item
+            android:id="@+id/action_log_in"
+            android:title="Log in" />
+    <item
+            android:id="@+id/action_setting"
+            android:title="Setting" />
+</menu>
