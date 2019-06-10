@@ -22,8 +22,8 @@ enum class ItemsListPeriod(idx: Int) {
 
 class ItemRepository {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
-    private val liveItemsList = MutableLiveData<List<Item>>(emptyList())
-    private val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.TODAY)
+    val liveItemsList = MutableLiveData<List<Item>>(emptyList())
+    val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.TODAY)
     val isRefreshing = MutableLiveData<Boolean>(false)
 
     fun setItemsListPeriod(newPeriod: ItemsListPeriod) {
@@ -41,10 +41,6 @@ class ItemRepository {
     fun getItem(id: String): Item? {
         syncList(false)
         return liveItemsList.value!!.firstOrNull { id == it.id }
-    }
-
-    fun getPeriod(): LiveData<ItemsListPeriod> {
-        return period
     }
 
     fun deleteItem(itemId: String) {

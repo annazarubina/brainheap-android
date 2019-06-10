@@ -90,12 +90,17 @@ class WordsListFragment : Fragment() {
             activity?.title = email?.takeIf { it.isNotEmpty() }?.let{ "$baseTitle ($it)" } ?:baseTitle
         })
 
-        viewModel.liveDataItemList.observe(this, Observer {
+        viewModel.itemRepositry.liveItemsList.observe(this, Observer {
             adapter.loadItems(it ?: emptyList())
             adapter.notifyDataSetChanged()
         })
-        viewModel.isRefreshing.observe(this, Observer {
+
+        viewModel.itemRepositry.isRefreshing.observe(this, Observer {
             word_list_refresh.isRefreshing = it })
+
+        viewModel.itemRepositry.period.observe(this, Observer{
+            spinner.setSelection(it.ordinal)
+        })
 
         ArrayAdapter.createFromResource(
             activity,
@@ -113,9 +118,6 @@ class WordsListFragment : Fragment() {
                 viewModel.setWordsListPeriod(ItemsListPeriod.values()[position])
             }
         }
-        viewModel.period.observe(this, Observer{
-            spinner.setSelection(it.ordinal)
-        })
     }
 
 }

@@ -25,7 +25,8 @@ class WordsEditUploadActivity : AppCompatActivity() {
             bundle?.getString("title"),
             bundle?.getString("description"),
             bundle?.getString("translation"),
-            getSharedPreferences()
+            getSharedPreferences(),
+            bundle?.getString("itemId")
         )
     }
 

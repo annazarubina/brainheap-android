@@ -1,117 +1,88 @@
 package com.brainheap.android.ui.worddetail
 
-import android.annotation.TargetApi
-import android.content.Context
-import android.net.Uri
-import android.os.Build
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Html
-import android.text.Html.FROM_HTML_MODE_LEGACY
-import androidx.fragment.app.Fragment
+import android.text.Html.FROM_HTML_MODE_COMPACT
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.brainheap.android.R
+import com.brainheap.android.model.Item
 import com.brainheap.android.repository.ItemRepository
+import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
+import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_word_detail.*
-import java.util.regex.Pattern
 
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [WordDetailFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [WordDetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class WordDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
+    private val EDIT_WORDS_REQUEST = 1  // The request code
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var itemId: String? = null
+    private var item: Item? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_word_detail, container, false)
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val itemId = WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
-        word_detail_text_view.text = Html.fromHtml(HtmlTextBuilder(ItemRepository.instance.getItem(itemId)).process(), FROM_HTML_MODE_LEGACY)
-    }
+        word_detail_text_view.keyListener = null
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
+        itemId = WordDetailFragmentArgs.fromBundle(arguments!!).ItemId
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-//        if (context is OnFragmentInteractionListener) {
-//            listener = context
-//        } else {
-//            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-//        }
-    }
+        word_detail_edit_item_button.setOnClickListener {
+            startEditActivity()
+        }
 
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment WordDetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            WordDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        ItemRepository.instance.isRefreshing.observe(this, Observer<Boolean> {
+            word_detail_text_view.isEnabled = !it
+            word_detail_edit_item_button.isEnabled = !it
+            when(it) {
+                true -> word_detail_loading_spinner.visibility = View.VISIBLE
+                false -> word_detail_loading_spinner.visibility = View.GONE
             }
+        })
+
+        ItemRepository.instance.liveItemsList.observe(this, Observer<List<Item>> {
+            loadItem()
+            word_detail_text_view.setText(getItemHtmlText())
+        })
+    }
+
+    private fun loadItem() {
+        itemId?.let {
+            item = ItemRepository.instance.getItem(it)
+        }
+    }
+
+    private fun startEditActivity() {
+        startEditActivityForDescription(HtmlTextBuilder(item).splitDescription(item?.description))
+    }
+
+    private fun startEditActivityForDescription(splitDescription: HtmlTextBuilder.SplitDescription) {
+        val intent = Intent(this.context, WordsEditUploadActivity::class.java)
+        intent.putExtra("itemId", itemId)
+        intent.putExtra("title", item?.title)
+        intent.putExtra("description", splitDescription.description)
+        intent.putExtra("translation", splitDescription.translation)
+        startActivityForResult(intent, EDIT_WORDS_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == EDIT_WORDS_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                ItemRepository.instance.syncList(true)
+            }
+        }
+    }
+
+    private fun getItemHtmlText(): CharSequence {
+        return Html.fromHtml(HtmlTextBuilder(item).process(), FROM_HTML_MODE_COMPACT)
     }
 }

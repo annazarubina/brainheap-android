@@ -11,7 +11,7 @@ class HtmlTextBuilder(val item: Item?) {
     }
 
     fun process(): String? =
-        convertToHtml(splitDescription())
+        convertToHtml(splitDescription(item?.description))
             .let { it.description + it.translation }
 
     private fun convertToHtml(src: SplitDescription): SplitDescription =
@@ -49,8 +49,7 @@ class HtmlTextBuilder(val item: Item?) {
         })
     }
 
-    private fun splitDescription(): SplitDescription {
-        val src = item?.description
+    fun splitDescription(src: String?): SplitDescription {
         return src
             ?.indexOf(TRANSLATION_SEPARATOR)
             ?.takeIf { it > 0 && it < src.length - TRANSLATION_SEPARATOR.length }
@@ -63,7 +62,7 @@ class HtmlTextBuilder(val item: Item?) {
             ?: SplitDescription(src, "")
     }
 
-    private class SplitDescription(var description: String?, var translation: String?)
+    class SplitDescription(var description: String?, var translation: String?)
 
     private class ReplaceFragment(val start: Int, val end: Int, val text: String)
 }

@@ -1,12 +1,11 @@
 package com.brainheap.android.ui.wordseditupload
 
-import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.brainheap.android.network.RetrofitFactory
 import com.brainheap.android.preferences.Constants.ID_PROP
 import com.brainheap.android.preferences.Constants.SHOW_TRANSALTION
-import com.brainheap.android.network.RetrofitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,52 +13,50 @@ import kotlinx.coroutines.launch
 class WordsEditUploadViewModel : ViewModel() {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
 
+    var itemId: String? = null
+
     val itemSaved = MutableLiveData<Boolean>(false)
-    val showTranslation = MutableLiveData<Boolean>(true)
-    val titleText = MutableLiveData<String>()
-    val descriptionText = MutableLiveData<String>()
-    val translationText = MutableLiveData<String>()
+    var title: String? = null
+    var description: String? = null
     var sharedPreferences: SharedPreferences? = null
 
-    fun init(titleString: String?, descriptionString: String?, translationString: String?, sharedPreferences: SharedPreferences) {
+    var cashedDescription: String? = null
+
+    val translation = MutableLiveData<String?>()
+
+    fun init(
+        titleString: String?, descriptionString: String?, translationString: String?,
+        sharedPreferences: SharedPreferences, itemId: String?
+    ) {
         this.sharedPreferences = sharedPreferences
-        showTranslation.value = sharedPreferences.getBoolean(SHOW_TRANSALTION, true)
-        titleText.value = titleString
-        descriptionText.value = descriptionString
-        translationText.value = translationString
-        updateTranslatedText()
+        this.itemId = itemId
+        title = titleString
+        description = descriptionString
+        translation.value = translationString
     }
 
-    fun getUserId() : String? = sharedPreferences?.getString(ID_PROP, "")
+    fun getUserId(): String? = sharedPreferences?.getString(ID_PROP, "")
 
-    private fun updateTranslatedText() {
+    fun updateTranslation(description: String?) {
         val userId = getUserId()
-        if (!descriptionText.value.isNullOrEmpty() && !userId.isNullOrEmpty() && showTranslation.value == true) {
-            CoroutineScope(Dispatchers.IO).launch {
+        description
+            ?.takeIf { it.isNotEmpty() }
+            ?.takeIf { userId?.isNotEmpty() ?: false }
+            ?.takeIf { cashedDescription?.let { it != description } ?: true }
+            ?.let {
+                CoroutineScope(Dispatchers.IO).launch {
                     try {
                         val request = retrofitService
-                            .translateAsync(userId,"\"" + descriptionText.value!! + "\"")
+                            .translateAsync(userId!!, "\"" + description + "\"")
                         val response = request.await()
-                        if (response.isSuccessful) {
-                            translationText.postValue(response.body())
-                        } else {
-                            translationText.postValue("")
-                        }
+                        require(response.isSuccessful) { "Result: ${response.code()}" }
+                        translation.postValue(response.body())
                     } catch (e: Throwable) {
-                        "Error: ${e.message}"
-                        translationText.postValue("")
+                        "Translation error: ${e.message}"
+                        translation.postValue("")
                     }
                 }
-        } else {
-            translationText.postValue("")
-        }
-    }
-
-    @SuppressLint("CommitPrefEdits")
-    fun setShowTranslatedText(value: Boolean) {
-        if (showTranslation.value?.equals(value) == true) return
-        sharedPreferences!!.edit().putBoolean(SHOW_TRANSALTION, value).apply()
-        showTranslation.value = value
-        updateTranslatedText()
+            }
+            ?: let { translation.postValue("") }
     }
 }
