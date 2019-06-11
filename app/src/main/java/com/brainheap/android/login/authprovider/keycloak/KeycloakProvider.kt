@@ -36,6 +36,7 @@ class KeycloakProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(d
             ?.takeIf { it.toString().startsWith(KeycloakProperties.redirectUri) }
             ?.let { it.getQueryParameter("code") }
             ?.let { exchangeCodeForToken(it) }
+            ?:onLoginFailed()
     }
 
     @SuppressLint("CheckResult")
