@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun logOut() {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString(Constants.ID_PROP, "").apply()
+        AuthProviderManager.logout()
         CredentialsHolder.clean()
-        AuthProviderManager.data.clean()
     }
 }

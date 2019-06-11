@@ -15,6 +15,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="150dp"
+            android:visibility="gone"
             android:padding="10dp"/>
     <EditText
             android:layout_width="wrap_content"

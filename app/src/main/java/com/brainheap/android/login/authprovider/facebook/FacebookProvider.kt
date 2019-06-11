@@ -2,24 +2,24 @@ package com.brainheap.android.login.authprovider.facebook
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.login.AuthProvider
 import com.brainheap.android.login.authprovider.facebook.client.FacebookClientFactory
 import com.brainheap.android.login.data.AuthProgressData
-import com.brainheap.android.ui.login.OAuthUserData
+import com.brainheap.android.login.data.OAuthUserData
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class FacebookProvider(data: AuthProgressData) : AuthProvider(data) {
+class FacebookProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(data) {
     private val fbLoginManager: LoginManager = LoginManager.getInstance()
     private val callbackManager: CallbackManager = CallbackManager.Factory.create()
 
@@ -38,12 +38,12 @@ class FacebookProvider(data: AuthProgressData) : AuthProvider(data) {
 
                 override fun onCancel() {
                     Toast.makeText(BrainheapApp.applicationContext(), "Facebook: onCancel", Toast.LENGTH_SHORT).show()
-                    data.onFailed()
+                    onLoginFailed()
                 }
 
                 override fun onError(error: FacebookException) {
                     Toast.makeText(BrainheapApp.applicationContext(), "Facebook: onError", Toast.LENGTH_SHORT).show()
-                    data.onFailed()
+                    onLoginFailed()
                 }
             }
         )
@@ -51,15 +51,12 @@ class FacebookProvider(data: AuthProgressData) : AuthProvider(data) {
 
     override fun doLogin() {
         init()
-        data.start()
         fbLoginManager.logInWithReadPermissions(activity, Arrays.asList("public_profile", "email"))
     }
 
     override fun doOnLoginActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, intent)
     }
-
-    override fun logout() {}
 
     override fun getRequestCode(): Int = 9002
 
@@ -72,7 +69,7 @@ class FacebookProvider(data: AuthProgressData) : AuthProvider(data) {
                 require(response.isSuccessful) { "Get user info failed: ${response.code()}" }
                 val email = response.body()?.email
                 require(email?.isNotEmpty() ?: false) { "Email is empty" }
-                data.onSuccess(
+                onLoginSuccess(
                     OAuthUserData(
                         email,
                         token
@@ -80,7 +77,7 @@ class FacebookProvider(data: AuthProgressData) : AuthProvider(data) {
                 )
             } catch (e: Throwable) {
                 toastMessage = "Exception ${e.message}"
-                data.onFailed()
+                onLoginFailed()
             }
             toastMessage?.let {
                 withContext(Dispatchers.Main) {

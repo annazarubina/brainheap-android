@@ -1,6 +1,7 @@
 package com.brainheap.android.login
 
 import android.app.Activity
+import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.login.authprovider.facebook.FacebookProvider
 import com.brainheap.android.login.authprovider.google.GoogleProvider
 import com.brainheap.android.login.authprovider.keycloak.KeycloakProvider
@@ -9,7 +10,7 @@ import com.brainheap.android.login.data.AuthProgressData
 object AuthProviderManager {
     private var active = AuthProvider.Type.KEYCLOAK_SERVER
     private var providers: MutableMap<AuthProvider.Type, AuthProvider> = HashMap()
-    val data: AuthProgressData = AuthProgressData()
+    val data = MutableLiveData<AuthProgressData>()
 
     fun get(): AuthProvider =
         providers[active] ?: let {
@@ -22,6 +23,14 @@ object AuthProviderManager {
     fun login(type: AuthProvider.Type, activity: Activity) {
         switch(type)
         get().login(activity)
+    }
+
+    fun logout() {
+        get().logout()
+    }
+
+    fun loginByEmailOnly(email: String?, activity: Activity) {
+        get().loginByEmailOnly(email, activity)
     }
 
     private fun switch(type: AuthProvider.Type): AuthProvider {

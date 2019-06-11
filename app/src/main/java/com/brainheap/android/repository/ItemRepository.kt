@@ -13,7 +13,7 @@ import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class ItemsListPeriod(idx: Int) {
+enum class ItemsListPeriod(val idx: Int) {
     TODAY(0),
     THIS_WEEK(1),
     THIS_MONTH(2),

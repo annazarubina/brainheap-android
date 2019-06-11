@@ -2,18 +2,19 @@ package com.brainheap.android.login.authprovider.google
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.login.AuthProvider
 import com.brainheap.android.login.data.AuthProgressData
-import com.brainheap.android.ui.login.OAuthUserData
+import com.brainheap.android.login.data.OAuthUserData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 
-class GoogleProvider(data: AuthProgressData) : AuthProvider(data) {
+class GoogleProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(data) {
     override fun doLogin() {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(activity!!.getString(R.string.google_app_id))
@@ -35,7 +36,7 @@ class GoogleProvider(data: AuthProgressData) : AuthProvider(data) {
         try {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(intent)
             val account: GoogleSignInAccount = task.getResult(ApiException::class.java)!!
-            data.onSuccess(
+            onLoginSuccess(
                 OAuthUserData(
                     account.email,
                     account.idToken
@@ -43,7 +44,7 @@ class GoogleProvider(data: AuthProgressData) : AuthProvider(data) {
             )
         } catch (e: ApiException) {
             toastMessage = "Api exception. Error code: " + e.statusCode
-            data.onFailed()
+            onLoginFailed()
         }
         toastMessage?.let {
             Toast.makeText(
@@ -53,8 +54,6 @@ class GoogleProvider(data: AuthProgressData) : AuthProvider(data) {
             ).show()
         }
     }
-
-    override fun logout() {}
 
     override fun getRequestCode(): Int = 9001
 }

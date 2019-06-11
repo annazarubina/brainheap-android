@@ -33,7 +33,7 @@
             android:padding="10dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:src="@android:drawable/ic_menu_edit"
+            android:src="@drawable/pencil_outline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/word_detail_edit_item_button"

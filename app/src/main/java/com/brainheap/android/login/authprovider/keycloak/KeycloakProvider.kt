@@ -4,18 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.config.KeycloakProperties
 import com.brainheap.android.login.AuthProvider
 import com.brainheap.android.login.authprovider.keycloak.client.KeycloakClientFactory
 import com.brainheap.android.login.data.AuthProgressData
-import com.brainheap.android.ui.login.OAuthUserData
+import com.brainheap.android.login.data.OAuthUserData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class KeycloakProvider(data: AuthProgressData) : AuthProvider(data) {
+class KeycloakProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(data) {
     private val client = KeycloakClientFactory.get()
 
     private val authCodeUrl = Uri.parse(KeycloakProperties.authCodeUrl)
@@ -35,9 +36,6 @@ class KeycloakProvider(data: AuthProgressData) : AuthProvider(data) {
             ?.takeIf { it.toString().startsWith(KeycloakProperties.redirectUri) }
             ?.let { it.getQueryParameter("code") }
             ?.let { exchangeCodeForToken(it) }
-    }
-
-    override fun logout() {
     }
 
     @SuppressLint("CheckResult")
@@ -60,7 +58,7 @@ class KeycloakProvider(data: AuthProgressData) : AuthProvider(data) {
                 require(userInfoResponse.isSuccessful) { "Get user info failed: ${tokenResponse.code()}" }
                 val email = userInfoResponse.body()?.email
                 require(email?.isNotEmpty() ?: false) { "Email is empty" }
-                data.onSuccess(
+                onLoginSuccess(
                     OAuthUserData(
                         email,
                         token
@@ -68,7 +66,7 @@ class KeycloakProvider(data: AuthProgressData) : AuthProvider(data) {
                 )
             } catch (e: Throwable) {
                 toastMessage = "Exception ${e.message}"
-                data.onFailed()
+                onLoginFailed()
             }
             toastMessage?.let {
                 withContext(Dispatchers.Main) {

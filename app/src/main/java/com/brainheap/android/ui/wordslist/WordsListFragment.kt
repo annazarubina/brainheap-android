@@ -2,27 +2,25 @@ package com.brainheap.android.ui.wordslist
 
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.brainheap.android.R
 import com.brainheap.android.preferences.CredentialsHolder
-import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.repository.ItemsListPeriod
-import kotlinx.android.synthetic.main.fragment_words_list.*
 import com.brainheap.android.ui.ClipboardProcessor
 import com.brainheap.android.ui.login.LoginActivity
-import com.brainheap.android.R
+import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.ui.wordsupload.WordsUploadActivity
+import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_words_list.*
 
 class WordsListFragment : Fragment() {
     private lateinit var viewModel: WordsListViewModel
@@ -39,7 +37,7 @@ class WordsListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        baseTitle?:let{ activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
+        baseTitle ?: let { activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
 
         if (CredentialsHolder.userId.value.isNullOrEmpty()) {
             startActivity(Intent(context, LoginActivity::class.java))
@@ -52,15 +50,15 @@ class WordsListFragment : Fragment() {
         words_list_refresh_button.setOnClickListener { viewModel.refresh() }
         words_list_add_button.setOnClickListener {
             ClipboardProcessor(context!!).process()
-                ?.let{
+                ?.let {
                     val intent = Intent(this.context, WordsUploadActivity::class.java)
-                    intent.putExtra ("text", it)
+                    intent.putExtra("text", it)
                     startActivity(intent)
                 }
-                ?:let{
+                ?: let {
                     val intent = Intent(this.context, WordsEditUploadActivity::class.java)
-                    intent.putExtra ("title", "title")
-                    intent.putExtra ("description", "description" )
+                    intent.putExtra("title", "title")
+                    intent.putExtra("description", "description")
                     startActivity(intent)
                 }
         }
@@ -87,7 +85,7 @@ class WordsListFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(words_list_recyclerView)
 
         CredentialsHolder.email.observe(this, Observer { email ->
-            activity?.title = email?.takeIf { it.isNotEmpty() }?.let{ "$baseTitle ($it)" } ?:baseTitle
+            activity?.title = email?.takeIf { it.isNotEmpty() }?.let { "$baseTitle ($it)" } ?: baseTitle
         })
 
         viewModel.itemRepositry.liveItemsList.observe(this, Observer {
@@ -96,28 +94,20 @@ class WordsListFragment : Fragment() {
         })
 
         viewModel.itemRepositry.isRefreshing.observe(this, Observer {
-            word_list_refresh.isRefreshing = it })
-
-        viewModel.itemRepositry.period.observe(this, Observer{
-            spinner.setSelection(it.ordinal)
+            word_list_refresh.isRefreshing = it
         })
 
-        ArrayAdapter.createFromResource(
-            activity,
-            R.array.items_time_array,
-            R.layout.word_list_spinner
-        ).also { spinAdapter ->
-            spinAdapter.setDropDownViewResource(R.layout.word_list_spinner)
-            spinner.adapter = spinAdapter
-        }
-        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+        viewModel.itemRepositry.period.observe(this, Observer {
+            words_list_tab.getTabAt(it.ordinal)?.select()
+        })
 
+        words_list_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                viewModel.setWordsListPeriod(ItemsListPeriod.values()[tab.position])
             }
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                viewModel.setWordsListPeriod(ItemsListPeriod.values()[position])
-            }
-        }
+
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+        })
     }
-
 }

@@ -56,8 +56,7 @@ class WordsEditUploadFragment : Fragment() {
 
         viewModel.translation.observe(this, Observer {
             translatedEditText?.setText(it ?: "")
-        }
-        )
+        })
 
         viewModel.itemSaved.observe(this, Observer<Boolean> { saved ->
             if (saved) {
@@ -70,78 +69,93 @@ class WordsEditUploadFragment : Fragment() {
             }
         })
 
-    edit_send_to_server_button.setOnClickListener {
-        val userId = viewModel.getUserId()
-        val title = titleEditText?.editableText.toString()
-        val description = descriptionEditText?.editableText.toString()
-        val translation = translatedEditText?.editableText.toString()
-        if (userId.isNullOrEmpty()) {
-            Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
-            return@setOnClickListener
-        }
-        if (title.isEmpty() || description.isEmpty()) {
-            Toast.makeText(
-                BrainheapApp.applicationContext(),
-                "Pick some words for title and description",
-                Toast.LENGTH_SHORT
-            ).show()
-            return@setOnClickListener
-        }
-        Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            var toastMessage: String
-            try {
-                val createItemRequest = viewModel.itemId?.takeIf { it.isNotEmpty() }?.let {
-                    retrofitService
-                        .updateItemAsync(
-                            userId,
-                            it,
-                            ItemView(title, description + translation.let { " /// $translation" })
-                        )
-                } ?: let {
-                    retrofitService
-                        .createItemAsync(
-                            userId,
-                            ItemView(title, description + translation.let { " /// $translation" })
-                        )
-                }
-                val createItemResponse = createItemRequest.await()
-                toastMessage = if (createItemResponse.isSuccessful) {
-                    val itemId = createItemResponse.body()?.id
-                    viewModel.itemSaved.postValue(true)
-                    "Item created Id $itemId"
-                } else {
-                    "CreateItem failed:${createItemResponse.code()}"
-                }
-
-            } catch (e: HttpException) {
-                toastMessage = "Exception ${e.message}"
-
-            } catch (e: Throwable) {
-                toastMessage = "Exception ${e.message}"
+        edit_send_to_server_button.setOnClickListener {
+            val userId = viewModel.getUserId()
+            val title = titleEditText?.editableText.toString()
+            val description = descriptionEditText?.editableText.toString()
+            val translation = translatedEditText?.editableText.toString()
+            if (userId.isNullOrEmpty()) {
+                Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-
-            withContext(Dispatchers.Main) {
-                Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
+            if (title.isEmpty() || description.isEmpty()) {
+                Toast.makeText(
+                    BrainheapApp.applicationContext(),
+                    "Pick some words for title and description",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
             }
+            Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                var toastMessage: String
+                try {
+                    val createItemRequest = viewModel.itemId?.takeIf { it.isNotEmpty() }?.let {
+                        retrofitService
+                            .updateItemAsync(
+                                userId,
+                                it,
+                                ItemView(title, description + translation.let { " /// $translation" })
+                            )
+                    } ?: let {
+                        retrofitService
+                            .createItemAsync(
+                                userId,
+                                ItemView(title, description + translation.let { " /// $translation" })
+                            )
+                    }
+                    val createItemResponse = createItemRequest.await()
+                    toastMessage = if (createItemResponse.isSuccessful) {
+                        val itemId = createItemResponse.body()?.id
+                        viewModel.itemSaved.postValue(true)
+                        "Item created Id $itemId"
+                    } else {
+                        "CreateItem failed:${createItemResponse.code()}"
+                    }
+
+                } catch (e: HttpException) {
+                    toastMessage = "Exception ${e.message}"
+
+                } catch (e: Throwable) {
+                    toastMessage = "Exception ${e.message}"
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        descriptionEditText.setOnFocusChangeListener{ _, hasFocus ->
+            if(!hasFocus) {
+                updateSyncTranslationButtonState()
+            }
+        }
+
+        edit_show_translated_text_checkBox.setOnCheckedChangeListener { _, it ->
+            when (it) {
+                true -> {
+                    translatedEditText.visibility = View.VISIBLE
+                    viewModel.updateTranslation(descriptionEditText?.editableText.toString())
+                }
+                false -> translatedEditText.visibility = View.GONE
+            }
+            updateSyncTranslationButtonState()
+        }
+
+        words_edit_upload_sync_translation.setOnClickListener {
+            viewModel.updateTranslation(descriptionEditText?.editableText.toString())
         }
     }
 
-     descriptionEditText.setOnFocusChangeListener{ _, hasFocus ->
-         if(!hasFocus && edit_show_translated_text_checkBox.isChecked) {
-             viewModel.updateTranslation(descriptionEditText?.editableText.toString())
-         }
-     }
-
-    edit_show_translated_text_checkBox.setOnCheckedChangeListener { _, it ->
-        when (it) {
-            true -> {
-                translatedEditText.visibility = View.VISIBLE
-                viewModel.updateTranslation(descriptionEditText?.editableText.toString())
-            }
-            false -> translatedEditText.visibility = View.GONE
+    private fun updateSyncTranslationButtonState() {
+        when(isSyncTranslationAvalable()) {
+            true -> words_edit_upload_sync_translation.visibility = View.VISIBLE
+            false -> words_edit_upload_sync_translation.visibility = View.GONE
         }
     }
-}
+    private fun isSyncTranslationAvalable() : Boolean  {
+        return edit_show_translated_text_checkBox.isChecked && viewModel.cashedDescription != descriptionEditText?.editableText.toString()
+    }
 }
