@@ -1,11 +1,12 @@
 package com.brainheap.android.ui.wordseditupload
 
-import android.content.SharedPreferences
+import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.preferences.AppPreferences
+import com.brainheap.android.preferences.Constants
 import com.brainheap.android.preferences.Constants.ID_PROP
-import com.brainheap.android.preferences.Constants.SHOW_TRANSALTION
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,49 +15,57 @@ class WordsEditUploadViewModel : ViewModel() {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
 
     var itemId: String? = null
-
+    var userId: String? = null
     val itemSaved = MutableLiveData<Boolean>(false)
+
     var title: String? = null
     var description: String? = null
-    var sharedPreferences: SharedPreferences? = null
+    val translation = MutableLiveData<String?>()
+    val showTranslation = MutableLiveData<Boolean>(true)
 
     var cashedDescription: String? = null
+    var cashedTranslation: String? = null
 
-    val translation = MutableLiveData<String?>()
-
-    fun init(
-        titleString: String?, descriptionString: String?, translationString: String?,
-        sharedPreferences: SharedPreferences, itemId: String?
-    ) {
-        this.sharedPreferences = sharedPreferences
+    fun init(title: String?, description: String?, translation: String?, itemId: String?) {
         this.itemId = itemId
-        title = titleString
-        description = descriptionString
-        translation.value = translationString
+        this.userId = AppPreferences.get().getString(ID_PROP, "")
+        this.showTranslation.postValue(translation?.isNotEmpty())
+        this.translation.postValue(translation)
+        this.title = title
+        this.description = description
+
+        this.cashedDescription = description
+        this.cashedTranslation = translation
     }
 
-    fun getUserId(): String? = sharedPreferences?.getString(ID_PROP, "")
+    @SuppressLint("CommitPrefEdits")
+    fun save() {
+        AppPreferences.get().edit().putBoolean(Constants.SHOW_TRANSALTION, showTranslation.value ?: true).apply()
+    }
 
-    fun updateTranslation(description: String?) {
-        val userId = getUserId()
+    fun loadTranslation(description: String?) {
         description
             ?.takeIf { it.isNotEmpty() }
             ?.takeIf { userId?.isNotEmpty() ?: false }
-            ?.takeIf { cashedDescription?.let { it != description } ?: true }
+            ?.takeIf { showTranslation.value == true }
             ?.let {
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        val request = retrofitService
-                            .translateAsync(userId!!, "\"" + description + "\"")
-                        val response = request.await()
-                        require(response.isSuccessful) { "Result: ${response.code()}" }
-                        translation.postValue(response.body())
-                    } catch (e: Throwable) {
-                        "Translation error: ${e.message}"
-                        translation.postValue("")
+                if (cashedDescription != description || cashedTranslation.isNullOrEmpty()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        cashedTranslation = try {
+                            val request = retrofitService
+                                .translateAsync(userId!!, "\"" + it + "\"")
+                            val response = request.await()
+                            require(response.isSuccessful) { "Result: ${response.code()}" }
+                            cashedDescription = description
+                            response.body()
+                        } catch (e: Throwable) {
+                            ""
+                        }
+                        translation.postValue(cashedTranslation)
                     }
+                } else {
+                    translation.postValue(cashedTranslation)
                 }
-            }
-            ?: let { translation.postValue("") }
+            } ?: let { translation.postValue("") }
     }
 }

@@ -1,9 +1,7 @@
 package com.brainheap.android.ui.wordseditupload
 
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.R
 
@@ -25,10 +23,7 @@ class WordsEditUploadActivity : AppCompatActivity() {
             bundle?.getString("title"),
             bundle?.getString("description"),
             bundle?.getString("translation"),
-            getSharedPreferences(),
             bundle?.getString("itemId")
         )
     }
-
-    private fun getSharedPreferences(): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 }

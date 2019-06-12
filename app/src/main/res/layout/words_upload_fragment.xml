@@ -19,7 +19,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="250dp"
                 android:minHeight="24dp"
-                android:id="@+id/selectedTextView1"
+                android:id="@+id/selectedTextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textSize="26sp"
         />
     </ScrollView>

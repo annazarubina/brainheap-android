@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.R
+import com.brainheap.android.login.LoginModule
+import com.brainheap.android.preferences.CredentialsHolder
+import com.brainheap.android.ui.login.LoginActivity
 
 class WordsUploadActivity : AppCompatActivity() {
-
+    private val loginModule = LoginModule(this)
     private lateinit var viewModel: WordsUploadViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +25,9 @@ class WordsUploadActivity : AppCompatActivity() {
                 .commitNow()
         }
         handleIntent()
+        if (!loginModule.isLoggedIn()) {
+            loginModule.logIn()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -42,8 +48,6 @@ class WordsUploadActivity : AppCompatActivity() {
                     it.extras?.getString("text")?:"Sample text"
                 }
             }
-        }?.let{text -> viewModel.init(text, getSharedPreferences()) }
+        }?.let{text -> viewModel.init(text) }
     }
-
-    private fun getSharedPreferences(): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 }

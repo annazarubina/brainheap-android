@@ -12,6 +12,7 @@ import com.brainheap.android.R
 import com.brainheap.android.login.AuthProvider
 import com.brainheap.android.login.AuthProviderManager
 import com.brainheap.android.login.data.AuthProgressData
+import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants
 import com.brainheap.android.preferences.CredentialsHolder
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -19,13 +20,12 @@ import kotlinx.android.synthetic.main.fragment_login.*
 
 class LoginActivity : AppCompatActivity() {
     private val providerManager = AuthProviderManager
-    private var preferencesLoader = PreferencesLoader(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_login)
 
-        emailEditText.setText(preferencesLoader.get().getString(Constants.NAME_PROP, "Unknown"))
+        emailEditText.setText(AppPreferences.get().getString(Constants.NAME_PROP, "Unknown"))
 
         keycloak_login_button.setOnClickListener {
             updateAuthProvider(AuthProvider.Type.KEYCLOAK_SERVER)
@@ -78,19 +78,11 @@ class LoginActivity : AppCompatActivity() {
         if (!data.inProgress && data.userId?.isNotEmpty() == true) {
             CredentialsHolder.userId.postValue(data.userId)
             CredentialsHolder.email.postValue(data.email)
-            preferencesLoader.get().edit().putString(Constants.ID_PROP, data.userId).apply()
-            preferencesLoader.get().getString(Constants.NAME_PROP, "Unknown")
+            AppPreferences.get().edit().putString(Constants.ID_PROP, data.userId).apply()
+            AppPreferences.get().getString(Constants.NAME_PROP, "Unknown")
             finish()
         }
     }
 
-    internal class PreferencesLoader(val activity: AppCompatActivity) {
-        private var preferences: SharedPreferences? = null
-
-        fun get() =
-            preferences ?: let {
-                preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-                preferences
-            }!!
-    }
+    override fun onBackPressed() {}
 }

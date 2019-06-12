@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -21,8 +20,6 @@ import com.brainheap.android.R
 import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.RetrofitFactory
-import com.brainheap.android.ui.MainActivity
-import com.facebook.FacebookSdk.getApplicationContext
 import kotlinx.android.synthetic.main.words_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,26 +38,40 @@ class WordsUploadFragment : Fragment() {
     }
 
     private lateinit var viewModel: WordsUploadViewModel
-    private var selectedTextView: TextView? = null
-    private var translatedTextView: TextView? = null
-    private var showTranslatedTextCheckBox: CheckBox? = null
-
     private val retrofitService = RetrofitFactory.makeRetrofitService()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.words_upload_fragment, container, false)
-    }
+    ): View = inflater.inflate(R.layout.words_upload_fragment, container, false)
 
+    private fun initControls() {
+        selectedTextView?.movementMethod = LinkMovementMethod.getInstance()
+        selectedTextView?.highlightColor = resources.getColor(android.R.color.transparent, resources.newTheme())
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(WordsUploadViewModel::class.java)
+        }
         initControls()
 
-        viewModel.translatedText.observe(this, Observer<String> {
-            translatedTextView?.text = it ?: ""
+        viewModel.showTranslation.observe(this, Observer<Boolean> {
+            show_translated_text_checkBox?.isChecked = it
+            viewModel.loadTranslation()
+        })
+
+        viewModel.translation.observe(this, Observer<String> {
+            translatedTextView?.text = it
+        })
+
+        viewModel.itemSaved.observe(this, Observer<Boolean> {saved ->
+            if (saved) {
+                viewModel.save()
+                activity!!.setResult(Activity.RESULT_OK)
+                activity!!.finish()
+            }
         })
 
         viewModel.wordContext.observe(this, Observer<WordsContext> { wordsContext ->
@@ -93,30 +104,18 @@ class WordsUploadFragment : Fragment() {
             selectedTextView?.setText(ssb, TextView.BufferType.SPANNABLE)
         })
 
-        viewModel.itemSaved.observe(this, Observer<Boolean> {
-            if (it) activity!!.finish()
-        })
-
-        viewModel.showTranslatedText.observe(this, Observer<Boolean> {
-            showTranslatedTextCheckBox?.isChecked = it
-        })
-
-        viewModel.translatedText.observe(this, Observer<String> {
-            translatedTextView?.text = it
-        })
-
         edit_button.setOnClickListener {
             val intent = Intent(this.context, WordsEditUploadActivity::class.java)
             intent.putExtra ("title", extractTitle())
             intent.putExtra ("description", viewModel.wordContext.value?.context )
-            intent.putExtra ("translation", viewModel.translatedText.value )
+            intent.putExtra ("translation", viewModel.translation.value )
             startActivityForResult(intent, EDIT_WORDS_REQUEST)
         }
 
         send_to_server_button.setOnClickListener {
             val wordsContext = viewModel.wordContext.value
-            val translatedText = viewModel.translatedText.value
-            if (viewModel.userId.value.isNullOrEmpty()) {
+            val translatedText = viewModel.translation.value
+            if (viewModel.userId.isNullOrEmpty()) {
                 Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -131,7 +130,7 @@ class WordsUploadFragment : Fragment() {
                 try {
                     val createItemRequest = retrofitService
                         .createItemAsync(
-                            viewModel.userId.value!!,
+                            viewModel.userId!!,
                             ItemView( extractTitle()?:"", wordsContext.context + (translatedText?.let { " /// $translatedText" } ?: ""))
                         )
                     val createItemResponse = createItemRequest.await()
@@ -155,8 +154,8 @@ class WordsUploadFragment : Fragment() {
                 }
             }
         }
-        show_translated_text_checkBox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setShowTranslatedText(isChecked)
+        show_translated_text_checkBox.setOnCheckedChangeListener { _, checked ->
+            viewModel.showTranslation.postValue(checked)
         }
     }
 
@@ -180,16 +179,5 @@ class WordsUploadFragment : Fragment() {
                     .toLowerCase()
             }
             ?.joinToString(" ") { it }
-    }
-
-    private fun initControls() {
-        selectedTextView = activity?.findViewById(R.id.selectedTextView1)
-        translatedTextView = activity?.findViewById(R.id.translatedTextView)
-        showTranslatedTextCheckBox = activity?.findViewById(R.id.show_translated_text_checkBox)
-        selectedTextView?.movementMethod = LinkMovementMethod.getInstance()
-        selectedTextView?.highlightColor = resources.getColor(android.R.color.transparent, resources.newTheme())
-        activity?.let {
-            viewModel = ViewModelProviders.of(it).get(WordsUploadViewModel::class.java)
-        }
     }
 }

@@ -13,7 +13,6 @@ import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.RetrofitFactory
-import com.brainheap.android.preferences.Constants
 import kotlinx.android.synthetic.main.words_edit_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,19 +31,12 @@ class WordsEditUploadFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.words_edit_upload_fragment, container, false)
-    }
+    ): View = inflater.inflate(R.layout.words_edit_upload_fragment, container, false)
 
     private fun initControls() {
         titleEditText?.setText(viewModel.title ?: "")
         descriptionEditText?.setText(viewModel.description ?: "")
         translatedEditText?.setText(viewModel.translation.value ?: "")
-
-        edit_show_translated_text_checkBox?.isChecked =
-            viewModel.sharedPreferences
-                ?.getBoolean(Constants.SHOW_TRANSALTION, true)
-                ?: false
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -54,23 +46,26 @@ class WordsEditUploadFragment : Fragment() {
         }
         initControls()
 
+        viewModel.showTranslation.observe(this, Observer<Boolean> {
+            edit_show_translated_text_checkBox?.isChecked = it
+            viewModel.loadTranslation(descriptionEditText.editableText.toString())
+            updateSyncTranslationButtonState()
+        })
+
         viewModel.translation.observe(this, Observer {
             translatedEditText?.setText(it ?: "")
         })
 
         viewModel.itemSaved.observe(this, Observer<Boolean> { saved ->
             if (saved) {
-                edit_show_translated_text_checkBox?.let {
-                    viewModel.sharedPreferences?.edit()
-                        ?.putBoolean(Constants.SHOW_TRANSALTION, it.isChecked)?.apply()
-                }
+                viewModel.save()
                 activity!!.setResult(Activity.RESULT_OK)
                 activity!!.finish()
             }
         })
 
         edit_send_to_server_button.setOnClickListener {
-            val userId = viewModel.getUserId()
+            val userId = viewModel.userId
             val title = titleEditText?.editableText.toString()
             val description = descriptionEditText?.editableText.toString()
             val translation = translatedEditText?.editableText.toString()
@@ -127,35 +122,35 @@ class WordsEditUploadFragment : Fragment() {
             }
         }
 
-        descriptionEditText.setOnFocusChangeListener{ _, hasFocus ->
-            if(!hasFocus) {
+        descriptionEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
                 updateSyncTranslationButtonState()
             }
         }
 
-        edit_show_translated_text_checkBox.setOnCheckedChangeListener { _, it ->
-            when (it) {
+        edit_show_translated_text_checkBox.setOnCheckedChangeListener { _, checked ->
+            when (checked) {
                 true -> {
                     translatedEditText.visibility = View.VISIBLE
-                    viewModel.updateTranslation(descriptionEditText?.editableText.toString())
                 }
                 false -> translatedEditText.visibility = View.GONE
             }
-            updateSyncTranslationButtonState()
+            viewModel.showTranslation.postValue(checked)
         }
 
         words_edit_upload_sync_translation.setOnClickListener {
-            viewModel.updateTranslation(descriptionEditText?.editableText.toString())
+            viewModel.loadTranslation(descriptionEditText?.editableText.toString())
         }
     }
 
     private fun updateSyncTranslationButtonState() {
-        when(isSyncTranslationAvalable()) {
+        when (isSyncTranslationAvalable()) {
             true -> words_edit_upload_sync_translation.visibility = View.VISIBLE
             false -> words_edit_upload_sync_translation.visibility = View.GONE
         }
     }
-    private fun isSyncTranslationAvalable() : Boolean  {
+
+    private fun isSyncTranslationAvalable(): Boolean {
         return edit_show_translated_text_checkBox.isChecked && viewModel.cashedDescription != descriptionEditText?.editableText.toString()
     }
 }

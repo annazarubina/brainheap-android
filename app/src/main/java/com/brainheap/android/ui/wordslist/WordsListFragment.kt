@@ -29,19 +29,12 @@ class WordsListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_words_list, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.fragment_words_list, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         baseTitle ?: let { activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
-
-        if (CredentialsHolder.userId.value.isNullOrEmpty()) {
-            startActivity(Intent(context, LoginActivity::class.java))
-        }
 
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(WordsListViewModel::class.java)
