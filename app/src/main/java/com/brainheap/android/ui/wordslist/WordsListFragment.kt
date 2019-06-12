@@ -33,12 +33,11 @@ class WordsListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        baseTitle ?: let { activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
-
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(WordsListViewModel::class.java)
         }
+
+        baseTitle ?: let { activity?.title.toString() }.takeIf { it.isNotEmpty() }?.let { baseTitle = it }
 
         words_list_refresh_button.setOnClickListener { viewModel.refresh() }
         words_list_add_button.setOnClickListener {
@@ -79,6 +78,10 @@ class WordsListFragment : Fragment() {
 
         CredentialsHolder.email.observe(this, Observer { email ->
             activity?.title = email?.takeIf { it.isNotEmpty() }?.let { "$baseTitle ($it)" } ?: baseTitle
+        })
+
+        CredentialsHolder.userId.observe(this, Observer {
+            viewModel.itemRepositry.syncList(true)
         })
 
         viewModel.itemRepositry.liveItemsList.observe(this, Observer {

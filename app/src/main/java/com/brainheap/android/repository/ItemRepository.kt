@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.model.Item
 import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.preferences.AppPreferences
+import com.brainheap.android.preferences.Constants.PERIOD_PROP
 import com.brainheap.android.preferences.CredentialsHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +19,17 @@ enum class ItemsListPeriod(val idx: Int) {
     TODAY(0),
     THIS_WEEK(1),
     THIS_MONTH(2),
-    ALL(3)
+    ALL(3);
+
+    companion object {
+        fun get(int: Int) : ItemsListPeriod? = values().find { it.idx == int }
+    }
 }
 
 class ItemRepository {
     private val retrofitService = RetrofitFactory.makeRetrofitService()
     val liveItemsList = MutableLiveData<List<Item>>(emptyList())
-    val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.TODAY)
+    val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.get(AppPreferences.get().getInt(PERIOD_PROP, 0)))
     val isRefreshing = MutableLiveData<Boolean>(false)
 
     fun setItemsListPeriod(newPeriod: ItemsListPeriod) {
