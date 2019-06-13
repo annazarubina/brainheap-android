@@ -9,12 +9,12 @@ import com.brainheap.android.preferences.Constants
 import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.ui.login.LoginActivity
 
-class LoginModule(val activity: AppCompatActivity) {
+class LoginModule {
     private val providerManager = AuthProviderManager
 
     fun isLoggedIn() = CredentialsHolder.userId.value?.isNotEmpty() ?: false
 
-    fun logIn() = activity.startActivity(Intent(activity, LoginActivity::class.java))
+    fun logIn(activity: AppCompatActivity) = activity.startActivity(Intent(activity, LoginActivity::class.java))
 
     fun logOut() {
         AppPreferences.get().edit().putString(Constants.ID_PROP, "").apply()

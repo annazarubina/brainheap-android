@@ -8,19 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import com.brainheap.android.R
 import com.brainheap.android.login.LoginModule
 import com.facebook.FacebookSdk
-import com.facebook.appevents.AppEventsLogger
 
 
 class MainActivity : AppCompatActivity() {
-    private val loginModule = LoginModule(this)
+    private val loginModule = LoginModule()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        FacebookSdk.sdkInitialize(applicationContext)
-        AppEventsLogger.activateApp(this)
         if (!loginModule.isLoggedIn()) {
-            loginModule.logIn()
+            loginModule.logIn(this)
         }
     }
 
@@ -49,11 +46,11 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_log_out -> {
                 loginModule.logOut()
-                loginModule.logIn()
+                loginModule.logIn(this)
                 true
             }
             R.id.action_log_in -> {
-                loginModule.logIn()
+                loginModule.logIn(this)
                 true
             }
             R.id.action_setting -> {

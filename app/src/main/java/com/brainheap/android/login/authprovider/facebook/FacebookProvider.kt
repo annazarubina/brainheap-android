@@ -11,6 +11,9 @@ import com.brainheap.android.login.data.OAuthUserData
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
+import com.facebook.internal.Mutable
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import kotlinx.coroutines.CoroutineScope
@@ -20,10 +23,16 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class FacebookProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(data) {
-    private val fbLoginManager: LoginManager = LoginManager.getInstance()
-    private val callbackManager: CallbackManager = CallbackManager.Factory.create()
+    private lateinit var fbLoginManager: LoginManager
+    private lateinit var callbackManager: CallbackManager
 
     private fun init() {
+        FacebookSdk.sdkInitialize(BrainheapApp.applicationContext())
+        AppEventsLogger.activateApp(BrainheapApp.application())
+
+        fbLoginManager = LoginManager.getInstance()
+        callbackManager = CallbackManager.Factory.create()
+
         fbLoginManager.registerCallback(callbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {

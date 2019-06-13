@@ -8,7 +8,7 @@ import com.brainheap.android.R
 import com.brainheap.android.login.LoginModule
 
 class WordsUploadActivity : AppCompatActivity() {
-    private val loginModule = LoginModule(this)
+    private val loginModule = LoginModule()
     private lateinit var viewModel: WordsUploadViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +22,7 @@ class WordsUploadActivity : AppCompatActivity() {
         }
         handleIntent()
         if (!loginModule.isLoggedIn()) {
-            loginModule.logIn()
+            loginModule.logIn(this)
         }
     }
 
