@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
-import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.network.client.BrainheapClientFactory
 import kotlinx.android.synthetic.main.words_edit_upload_fragment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ class WordsEditUploadFragment : Fragment() {
     }
 
     private lateinit var viewModel: WordsEditUploadViewModel
-    private val retrofitService = RetrofitFactory.makeRetrofitService()
+    private val retrofitService = BrainheapClientFactory.get()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

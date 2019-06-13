@@ -1,15 +1,11 @@
 package com.brainheap.android.ui.wordsupload
 
 import android.content.Intent
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.R
 import com.brainheap.android.login.LoginModule
-import com.brainheap.android.preferences.CredentialsHolder
-import com.brainheap.android.ui.login.LoginActivity
 
 class WordsUploadActivity : AppCompatActivity() {
     private val loginModule = LoginModule(this)
@@ -36,7 +32,7 @@ class WordsUploadActivity : AppCompatActivity() {
     }
 
     private fun handleIntent() {
-        intent?.let{
+        intent?.let {
             when {
                 it.action == Intent.ACTION_SEND -> {
                     it.getCharSequenceExtra(Intent.EXTRA_TEXT).toString()
@@ -45,9 +41,9 @@ class WordsUploadActivity : AppCompatActivity() {
                     it.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
                 }
                 else -> {
-                    it.extras?.getString("text")?:"Sample text"
+                    it.extras?.getString("text") ?: "Sample text"
                 }
             }
-        }?.let{text -> viewModel.init(text) }
+        }?.let { text -> viewModel.init(text) }
     }
 }

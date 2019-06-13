@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.model.Item
-import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.network.client.BrainheapClientFactory
 import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants.PERIOD_PROP
 import com.brainheap.android.preferences.CredentialsHolder
@@ -27,7 +27,7 @@ enum class ItemsListPeriod(val idx: Int) {
 }
 
 class ItemRepository {
-    private val retrofitService = RetrofitFactory.makeRetrofitService()
+    private val retrofitService = BrainheapClientFactory.get()
     val liveItemsList = MutableLiveData<List<Item>>(emptyList())
     val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.get(AppPreferences.get().getInt(PERIOD_PROP, 0)))
     val isRefreshing = MutableLiveData<Boolean>(false)

@@ -3,7 +3,7 @@ package com.brainheap.android.ui.wordseditupload
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.network.client.BrainheapClientFactory
 import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants
 import com.brainheap.android.preferences.Constants.ID_PROP
@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WordsEditUploadViewModel : ViewModel() {
-    private val retrofitService = RetrofitFactory.makeRetrofitService()
+    private val retrofitService = BrainheapClientFactory.get()
 
     var itemId: String? = null
     var userId: String? = null

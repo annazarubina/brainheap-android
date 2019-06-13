@@ -3,7 +3,7 @@ package com.brainheap.android.ui.wordsupload
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.network.client.BrainheapClientFactory
 import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants.ID_PROP
 import com.brainheap.android.preferences.Constants.SHOW_TRANSALTION
@@ -16,7 +16,7 @@ data class Word(val word: String, val start: Int, val end: Int, var pickedTime: 
 data class WordsContext(val context: String, val wordList: List<Word>)
 
 class WordsUploadViewModel : ViewModel() {
-    private val retrofitService = RetrofitFactory.makeRetrofitService()
+    private val retrofitService = BrainheapClientFactory.get()
 
     var userId: String? = null
     val itemSaved = MutableLiveData<Boolean>(false)

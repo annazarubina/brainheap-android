@@ -15,6 +15,7 @@ import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants
 import com.brainheap.android.preferences.CredentialsHolder
+import com.brainheap.android.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_login.*
 
 
@@ -81,6 +82,7 @@ class LoginActivity : AppCompatActivity() {
             AppPreferences.get().edit().putString(Constants.ID_PROP, data.userId).apply()
             AppPreferences.get().getString(Constants.NAME_PROP, "Unknown")
             finish()
+            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 

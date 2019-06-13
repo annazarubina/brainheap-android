@@ -1,4 +1,4 @@
-package com.brainheap.android.network
+package com.brainheap.android.network.client
 
 import com.brainheap.android.model.Item
 import com.brainheap.android.model.ItemView
@@ -9,7 +9,7 @@ import retrofit2.Response
 import retrofit2.http.*
 
 
-interface RetrofitService {
+interface BrainheapClient {
     @GET("/users")
     fun findUserAsync(@Query("email") email: String): Deferred<Response<List<User>>>
 

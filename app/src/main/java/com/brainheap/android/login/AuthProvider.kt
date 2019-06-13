@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.login.data.OAuthUserData
 import com.brainheap.android.model.UserView
-import com.brainheap.android.network.RetrofitFactory
+import com.brainheap.android.network.client.BrainheapClientFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,7 +62,7 @@ abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
         value?.email?.let { email ->
             CoroutineScope(Dispatchers.IO).launch {
                 var userId: String? = null
-                val retrofitService = RetrofitFactory.makeRetrofitService()
+                val retrofitService = BrainheapClientFactory.get()
                 var toastMessage: String? = null
                 try {
                     val findUserRequest = retrofitService.findUserAsync(email)

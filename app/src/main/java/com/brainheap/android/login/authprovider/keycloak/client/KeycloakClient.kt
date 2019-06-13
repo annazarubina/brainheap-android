@@ -1,37 +1,16 @@
 package com.brainheap.android.login.authprovider.keycloak.client
 
 import com.brainheap.android.config.KeycloakProperties
-import com.google.gson.GsonBuilder
+import com.brainheap.android.network.RefrofitClientFactory
 import com.google.gson.annotations.SerializedName
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import java.util.*
 
-object KeycloakClientFactory {
-    private var client: KeycloakClient? = null
-
-    fun get(): KeycloakClient = client ?: create()
-
-    private fun create(): KeycloakClient {
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-
-        client = Retrofit.Builder()
-            .baseUrl("${KeycloakProperties.baseUrl}/")
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .build().create(KeycloakClient::class.java)
-
-        return client!!
-    }
-}
+object KeycloakClientFactory : RefrofitClientFactory<KeycloakClient>("${KeycloakProperties.baseUrl}/")
 
 interface KeycloakClient {
     @POST("token")

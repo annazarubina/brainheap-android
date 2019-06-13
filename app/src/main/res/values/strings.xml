@@ -14,7 +14,7 @@
     </string-array>
 
     <string name="facebook_base_url">https://graph.facebook.com/</string>
-
+    <string name="brainheap_base_url">https://brain-heap.herokuapp.com</string>
     <string name="keycloak_client_id">android-client</string>
     <string name="keycloak_client_Secret">cc230cf1-11fc-40c8-bacb-b12a6e85a67c</string>
     <string name="keycloak_base_url">https://brainheap-keycloak.herokuapp.com/auth/realms/brainheap/protocol/openid-connect</string>
