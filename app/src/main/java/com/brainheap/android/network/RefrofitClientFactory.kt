@@ -4,9 +4,8 @@ import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.reflect.ParameterizedType
 
-abstract class RefrofitClientFactory<T>(val baseUrl: String) {
+abstract class RefrofitClientFactory<T>(private val clazz: Class<T>, val baseUrl: String) {
     private var client: T? = null
 
     fun get(): T = client ?: create()
@@ -20,8 +19,7 @@ abstract class RefrofitClientFactory<T>(val baseUrl: String) {
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .build().create(
-                (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>)
+            .build().create(clazz)
         return client!!
     }
 }

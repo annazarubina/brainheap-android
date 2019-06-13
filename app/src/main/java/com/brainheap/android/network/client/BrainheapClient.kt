@@ -1,14 +1,18 @@
 package com.brainheap.android.network.client
 
+import com.brainheap.android.config.BrainheapProperties
 import com.brainheap.android.model.Item
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.model.User
 import com.brainheap.android.model.UserView
+import com.brainheap.android.network.RefrofitClientFactory
 import kotlinx.coroutines.Deferred
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
+object BrainheapClientFactory :
+    RefrofitClientFactory<BrainheapClient>(BrainheapClient::class.java, BrainheapProperties.baseUrl)
 
 interface BrainheapClient {
     @GET("/users")

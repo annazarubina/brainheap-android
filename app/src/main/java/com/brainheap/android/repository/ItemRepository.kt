@@ -22,7 +22,7 @@ enum class ItemsListPeriod(val idx: Int) {
     ALL(3);
 
     companion object {
-        fun get(int: Int) : ItemsListPeriod? = values().find { it.idx == int }
+        fun get(int: Int): ItemsListPeriod? = values().find { it.idx == int }
     }
 }
 

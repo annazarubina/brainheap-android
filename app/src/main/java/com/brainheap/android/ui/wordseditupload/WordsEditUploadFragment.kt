@@ -97,7 +97,8 @@ class WordsEditUploadFragment : Fragment() {
                             userId,
                             ItemView(
                                 title,
-                                HtmlTextBuilder.joinDescription(description, translation) ?: "")
+                                HtmlTextBuilder.joinDescription(description, translation) ?: ""
+                            )
                         )
                     },
                     object : QueueCallExecutor.Callback {

@@ -10,7 +10,8 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import java.util.*
 
-object KeycloakClientFactory : RefrofitClientFactory<KeycloakClient>("${KeycloakProperties.baseUrl}/")
+object KeycloakClientFactory :
+    RefrofitClientFactory<KeycloakClient>(KeycloakClient::class.java,"${KeycloakProperties.baseUrl}/")
 
 interface KeycloakClient {
     @POST("token")

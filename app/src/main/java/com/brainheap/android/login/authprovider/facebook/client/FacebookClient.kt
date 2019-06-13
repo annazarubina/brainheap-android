@@ -13,7 +13,8 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-object FacebookClientFactory : RefrofitClientFactory<FacebookClient>(FacebookProperties.baseUrl)
+object FacebookClientFactory :
+    RefrofitClientFactory<FacebookClient>(FacebookClient::class.java, FacebookProperties.baseUrl)
 
 interface FacebookClient {
     @GET("{userId}")
