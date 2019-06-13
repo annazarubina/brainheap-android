@@ -8,6 +8,11 @@ class HtmlTextBuilder(val item: Item?) {
     companion object {
         @JvmStatic
         val TRANSLATION_SEPARATOR = "///"
+        @JvmStatic
+        fun joinDescription(description: String?, translation: String?): String? =
+            description
+                ?.let { translation?.let { "$description $TRANSLATION_SEPARATOR $translation" } ?: let { description } }
+                ?: translation
     }
 
     fun process(): String? =
@@ -49,8 +54,8 @@ class HtmlTextBuilder(val item: Item?) {
         })
     }
 
-    fun splitDescription(src: String?): SplitDescription {
-        return src
+    fun splitDescription(src: String?): SplitDescription  =
+        src
             ?.indexOf(TRANSLATION_SEPARATOR)
             ?.takeIf { it > 0 && it < src.length - TRANSLATION_SEPARATOR.length }
             ?.let {
@@ -60,7 +65,6 @@ class HtmlTextBuilder(val item: Item?) {
                 )
             }
             ?: SplitDescription(src, "")
-    }
 
     class SplitDescription(var description: String?, var translation: String?)
 

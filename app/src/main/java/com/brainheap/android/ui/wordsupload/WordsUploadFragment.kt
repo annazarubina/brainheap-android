@@ -2,30 +2,27 @@ package com.brainheap.android.ui.wordsupload
 
 import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
-import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.client.BrainheapClientFactory
+import com.brainheap.android.network.client.QueueCallExecutor
+import com.brainheap.android.ui.worddetail.HtmlTextBuilder
+import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import kotlinx.android.synthetic.main.words_upload_fragment.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 
 class WordsUploadFragment : Fragment() {
 
@@ -66,7 +63,7 @@ class WordsUploadFragment : Fragment() {
             translatedTextView?.text = it
         })
 
-        viewModel.itemSaved.observe(this, Observer<Boolean> {saved ->
+        viewModel.itemSaved.observe(this, Observer<Boolean> { saved ->
             if (saved) {
                 viewModel.save()
                 activity!!.setResult(Activity.RESULT_OK)
@@ -106,16 +103,17 @@ class WordsUploadFragment : Fragment() {
 
         edit_button.setOnClickListener {
             val intent = Intent(this.context, WordsEditUploadActivity::class.java)
-            intent.putExtra ("title", extractTitle())
-            intent.putExtra ("description", viewModel.wordContext.value?.context )
-            intent.putExtra ("translation", viewModel.translation.value )
+            intent.putExtra("title", extractTitle())
+            intent.putExtra("description", viewModel.wordContext.value?.context)
+            intent.putExtra("translation", viewModel.translation.value)
             startActivityForResult(intent, EDIT_WORDS_REQUEST)
         }
 
         send_to_server_button.setOnClickListener {
+            val userId = viewModel.userId
             val wordsContext = viewModel.wordContext.value
-            val translatedText = viewModel.translation.value
-            if (viewModel.userId.isNullOrEmpty()) {
+            val translation = viewModel.translation.value
+            if (userId.isNullOrEmpty()) {
                 Toast.makeText(BrainheapApp.applicationContext(), "User is not registered", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -124,35 +122,22 @@ class WordsUploadFragment : Fragment() {
                 return@setOnClickListener
             }
             Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
-
-            CoroutineScope(Dispatchers.IO).launch {
-                var toastMessage: String
-                try {
-                    val createItemRequest = retrofitService
-                        .createItemAsync(
-                            viewModel.userId!!,
-                            ItemView( extractTitle()?:"", wordsContext.context + (translatedText?.let { " /// $translatedText" } ?: ""))
+            QueueCallExecutor.add(
+                QueueCallExecutor.Data(
+                    retrofitService.createItem(
+                        userId,
+                        ItemView(
+                            extractTitle() ?: "",
+                            HtmlTextBuilder.joinDescription(wordsContext.context, translation) ?: ""
                         )
-                    val createItemResponse = createItemRequest.await()
-                    toastMessage = if (createItemResponse.isSuccessful) {
-                        val itemId = createItemResponse.body()?.id
-                        viewModel.itemSaved.postValue(true)
-                        "Item created Id $itemId"
-                    } else {
-                        "CreateItem failed:${createItemResponse.code()}"
+                    ),
+                    object : QueueCallExecutor.Callback {
+                        override fun onSuccess() {}
+                        override fun onError(message: String) {}
                     }
-
-                } catch (e: HttpException) {
-                    toastMessage = "Exception ${e.message}"
-
-                } catch (e: Throwable) {
-                    toastMessage = "Exception ${e.message}"
-                }
-
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
-                }
-            }
+                )
+            )
+            viewModel.itemSaved.postValue(true)
         }
         show_translated_text_checkBox.setOnCheckedChangeListener { _, checked ->
             viewModel.showTranslation.postValue(checked)
@@ -167,7 +152,7 @@ class WordsUploadFragment : Fragment() {
         }
     }
 
-    private fun extractTitle() : String? {
+    private fun extractTitle(): String? {
         return viewModel.wordContext.value
             ?.wordList
             ?.filter { it.pickedTime.value != null }

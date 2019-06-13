@@ -5,6 +5,7 @@ import com.brainheap.android.model.ItemView
 import com.brainheap.android.model.User
 import com.brainheap.android.model.UserView
 import kotlinx.coroutines.Deferred
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -17,10 +18,10 @@ interface BrainheapClient {
     fun createUserAsync(@Body user: UserView): Deferred<Response<User>>
 
     @POST("/items/new")
-    fun createItemAsync(@Header("Authorization") userId: String, @Body item: ItemView): Deferred<Response<Item>>
+    fun createItem(@Header("Authorization") userId: String, @Body item: ItemView): Call<Item>
 
     @PATCH("/items/{itemId}")
-    fun updateItemAsync(@Header("Authorization") userId: String, @Path("itemId") itemId:String, @Body item: ItemView): Deferred<Response<Item>>
+    fun updateItem(@Header("Authorization") userId: String, @Path("itemId") itemId:String, @Body item: ItemView): Call<Item>
 
     @GET("/items")
     fun findItemsAsync(@Header("Authorization") userId: String, @Query("query") query: String?): Deferred<Response<List<Item>>>

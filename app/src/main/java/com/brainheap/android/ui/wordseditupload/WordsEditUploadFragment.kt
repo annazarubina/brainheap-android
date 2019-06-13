@@ -13,12 +13,9 @@ import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.client.BrainheapClientFactory
+import com.brainheap.android.network.client.QueueCallExecutor
+import com.brainheap.android.ui.worddetail.HtmlTextBuilder
 import kotlinx.android.synthetic.main.words_edit_upload_fragment.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 
 class WordsEditUploadFragment : Fragment() {
     companion object {
@@ -65,6 +62,7 @@ class WordsEditUploadFragment : Fragment() {
         })
 
         edit_send_to_server_button.setOnClickListener {
+            val itemId = viewModel.itemId?.takeIf { it.isNotEmpty() }
             val userId = viewModel.userId
             val title = titleEditText?.editableText.toString()
             val description = descriptionEditText?.editableText.toString()
@@ -82,44 +80,33 @@ class WordsEditUploadFragment : Fragment() {
                 return@setOnClickListener
             }
             Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
-
-            CoroutineScope(Dispatchers.IO).launch {
-                var toastMessage: String
-                try {
-                    val createItemRequest = viewModel.itemId?.takeIf { it.isNotEmpty() }?.let {
-                        retrofitService
-                            .updateItemAsync(
+            QueueCallExecutor.add(
+                QueueCallExecutor.Data(
+                    itemId
+                        ?.let {
+                            retrofitService.updateItem(
                                 userId,
                                 it,
-                                ItemView(title, description + translation.let { " /// $translation" })
+                                ItemView(
+                                    title,
+                                    HtmlTextBuilder.joinDescription(description, translation) ?: ""
+                                )
                             )
-                    } ?: let {
-                        retrofitService
-                            .createItemAsync(
-                                userId,
-                                ItemView(title, description + translation.let { " /// $translation" })
-                            )
+                        } ?: let {
+                        retrofitService.createItem(
+                            userId,
+                            ItemView(
+                                title,
+                                HtmlTextBuilder.joinDescription(description, translation) ?: "")
+                        )
+                    },
+                    object : QueueCallExecutor.Callback {
+                        override fun onSuccess() {}
+                        override fun onError(message: String) {}
                     }
-                    val createItemResponse = createItemRequest.await()
-                    toastMessage = if (createItemResponse.isSuccessful) {
-                        val itemId = createItemResponse.body()?.id
-                        viewModel.itemSaved.postValue(true)
-                        "Item created Id $itemId"
-                    } else {
-                        "CreateItem failed:${createItemResponse.code()}"
-                    }
-
-                } catch (e: HttpException) {
-                    toastMessage = "Exception ${e.message}"
-
-                } catch (e: Throwable) {
-                    toastMessage = "Exception ${e.message}"
-                }
-
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(BrainheapApp.applicationContext(), toastMessage, Toast.LENGTH_SHORT).show()
-                }
-            }
+                )
+            )
+            viewModel.itemSaved.postValue(true)
         }
 
         descriptionEditText.setOnFocusChangeListener { _, hasFocus ->
