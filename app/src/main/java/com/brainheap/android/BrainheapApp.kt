@@ -3,8 +3,6 @@ package com.brainheap.android
 import android.app.Application
 import android.content.Context
 import com.brainheap.android.network.client.QueueCallExecutor
-import com.facebook.FacebookSdk
-import com.facebook.appevents.AppEventsLogger
 
 class BrainheapApp : Application() {
     override fun onCreate() {

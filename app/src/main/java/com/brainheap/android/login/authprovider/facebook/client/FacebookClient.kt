@@ -21,12 +21,12 @@ interface FacebookClient {
     fun getUserInfoAsync(
         @Path(value = "userId") userId: String,
         @Query("access_token") token: String,
-        @Query("fields") grantType: String = "id,name,email"
+        @Query("fields") grantType: String = "itemId,name,email"
     ): Deferred<Response<FacebookUserInfo>>
 }
 
 data class FacebookUserInfo(
-    @SerializedName("id") var id: String? = null,
+    @SerializedName("itemId") var id: String? = null,
     @SerializedName("name") var name: String? = null,
     @SerializedName("email") var email: String? = null
 )

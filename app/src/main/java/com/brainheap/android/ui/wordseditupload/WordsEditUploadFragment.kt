@@ -81,30 +81,9 @@ class WordsEditUploadFragment : Fragment() {
             }
             Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
             QueueCallExecutor.add(
-                QueueCallExecutor.Data(
-                    itemId
-                        ?.let {
-                            retrofitService.updateItem(
-                                userId,
-                                it,
-                                ItemView(
-                                    title,
-                                    HtmlTextBuilder.joinDescription(description, translation) ?: ""
-                                )
-                            )
-                        } ?: let {
-                        retrofitService.createItem(
-                            userId,
-                            ItemView(
-                                title,
-                                HtmlTextBuilder.joinDescription(description, translation) ?: ""
-                            )
-                        )
-                    },
-                    object : QueueCallExecutor.Callback {
-                        override fun onSuccess() {}
-                        override fun onError(message: String) {}
-                    }
+                userId, itemId, ItemView(
+                    title,
+                    HtmlTextBuilder.joinDescription(description, translation) ?: ""
                 )
             )
             viewModel.itemSaved.postValue(true)

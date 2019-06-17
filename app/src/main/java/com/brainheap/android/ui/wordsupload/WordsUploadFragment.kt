@@ -123,18 +123,9 @@ class WordsUploadFragment : Fragment() {
             }
             Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
             QueueCallExecutor.add(
-                QueueCallExecutor.Data(
-                    retrofitService.createItem(
-                        userId,
-                        ItemView(
-                            extractTitle() ?: "",
-                            HtmlTextBuilder.joinDescription(wordsContext.context, translation) ?: ""
-                        )
-                    ),
-                    object : QueueCallExecutor.Callback {
-                        override fun onSuccess() {}
-                        override fun onError(message: String) {}
-                    }
+                userId, null, ItemView(
+                    extractTitle(),
+                    HtmlTextBuilder.joinDescription(wordsContext.context, translation) ?: ""
                 )
             )
             viewModel.itemSaved.postValue(true)
@@ -152,7 +143,7 @@ class WordsUploadFragment : Fragment() {
         }
     }
 
-    private fun extractTitle(): String? {
+    private fun extractTitle(): String {
         return viewModel.wordContext.value
             ?.wordList
             ?.filter { it.pickedTime.value != null }
@@ -164,5 +155,6 @@ class WordsUploadFragment : Fragment() {
                     .toLowerCase()
             }
             ?.joinToString(" ") { it }
+            ?:""
     }
 }
