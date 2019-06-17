@@ -4,8 +4,10 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(entities = [QueueCallItem::class], version = 1)
+@TypeConverters(QueueCallItem.ActionConverters::class)
 abstract class BrainheapDatabase : RoomDatabase() {
     abstract fun queueCallDao(): QueueCallDao
 

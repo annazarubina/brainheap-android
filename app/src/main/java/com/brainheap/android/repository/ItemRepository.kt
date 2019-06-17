@@ -1,15 +1,22 @@
 package com.brainheap.android.repository
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.brainheap.android.model.Item
+import com.brainheap.android.model.ItemView
 import com.brainheap.android.network.client.BrainheapClientFactory
+import com.brainheap.android.network.client.QueueCallExecutor
 import com.brainheap.android.preferences.AppPreferences
 import com.brainheap.android.preferences.Constants.PERIOD_PROP
 import com.brainheap.android.preferences.CredentialsHolder
+import com.brainheap.android.repository.database.QueueCallItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
@@ -26,11 +33,24 @@ enum class ItemsListPeriod(val idx: Int) {
     }
 }
 
-class ItemRepository {
+class ItemRepository : LifecycleOwner {
     private val retrofitService = BrainheapClientFactory.get()
+    private val lifecycleRegistry = LifecycleRegistry(this)
+
     val liveItemsList = MutableLiveData<List<Item>>(emptyList())
     val period = MutableLiveData<ItemsListPeriod>(ItemsListPeriod.get(AppPreferences.get().getInt(PERIOD_PROP, 0)))
     val isRefreshing = MutableLiveData<Boolean>(false)
+    private val queueCallExecutor = QueueCallExecutor()
+
+    override fun getLifecycle(): Lifecycle = lifecycleRegistry
+
+    init {
+        queueCallExecutor.start()
+        lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        queueCallExecutor.callSucceed.observe(this, Observer {
+            syncList(true)
+        })
+    }
 
     fun setItemsListPeriod(newPeriod: ItemsListPeriod) {
         if (newPeriod != period.value) {
@@ -39,35 +59,25 @@ class ItemRepository {
         }
     }
 
-    fun getItems(): LiveData<List<Item>> {
-        syncList(false)
-        return liveItemsList
-    }
-
     fun getItem(id: String): Item? {
         syncList(false)
         return liveItemsList.value!!.firstOrNull { id == it.id }
     }
 
     fun deleteItem(itemId: String) {
-        CredentialsHolder.userId.value?.takeIf { it.isNotEmpty() }?.let {
-            CoroutineScope(Dispatchers.IO).launch {
-                isRefreshing.postValue(true)
-                try {
-                    val itemDeleteResponse = retrofitService.deleteItemAsync(it, itemId).await()
-                    if (itemDeleteResponse.isSuccessful) {
-                        val copyList = liveItemsList.value!!.filter { itemId != it.id }
-                        liveItemsList.postValue(copyList)
-                    }
-                } catch (e: HttpException) {
-                    //toastMessage = "Exception ${e.message}"
+        queueCallExecutor.add(
+            QueueCallItem.Action.DELETE,
+            CredentialsHolder.userId.value!!, itemId, null
+        )
+        liveItemsList.postValue(liveItemsList.value?.filter { it.id != itemId })
+    }
 
-                } catch (e: Throwable) {
-                    //toastMessage = "Exception ${e.message}"
-                }
-                isRefreshing.postValue(false)
-            }
-        }
+    fun addItem(itemId: String?, itemView: ItemView) {
+        queueCallExecutor.add(itemId?.let { QueueCallItem.Action.UPDATE } ?: let { QueueCallItem.Action.CREATE },
+            CredentialsHolder.userId.value!!,
+            itemId,
+            itemView
+        )
     }
 
     fun syncList(force: Boolean) {

@@ -31,7 +31,7 @@ interface BrainheapClient {
     fun findItemsAsync(@Header("Authorization") userId: String, @Query("query") query: String?): Deferred<Response<List<Item>>>
 
     @DELETE("/items/{itemId}")
-    fun deleteItemAsync(@Header("Authorization") userId: String, @Path("itemId") itemId:String): Deferred<Response<Item>>
+    fun deleteItem(@Header("Authorization") userId: String, @Path("itemId") itemId:String): Call<Item>
 
     @GET("/translate")
     fun translateAsync(@Header("Authorization") userId: String, @Query("srcString") srcString: String ): Deferred<Response<String>>

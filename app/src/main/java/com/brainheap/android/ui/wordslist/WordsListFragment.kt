@@ -70,7 +70,6 @@ class WordsListFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val swipeAdapter = words_list_recyclerView.adapter as WordsListAdapter
                 viewModel.deleteItem(swipeAdapter.items[viewHolder.adapterPosition].id)
-
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)

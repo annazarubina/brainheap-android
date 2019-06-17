@@ -8,7 +8,6 @@ class BrainheapApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        QueueCallExecutor.start()
     }
 
     companion object {

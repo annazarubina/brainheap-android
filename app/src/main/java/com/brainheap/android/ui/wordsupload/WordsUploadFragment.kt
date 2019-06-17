@@ -18,8 +18,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.R
 import com.brainheap.android.model.ItemView
-import com.brainheap.android.network.client.BrainheapClientFactory
-import com.brainheap.android.network.client.QueueCallExecutor
+import com.brainheap.android.repository.ItemRepository
 import com.brainheap.android.ui.worddetail.HtmlTextBuilder
 import com.brainheap.android.ui.wordseditupload.WordsEditUploadActivity
 import kotlinx.android.synthetic.main.words_upload_fragment.*
@@ -35,7 +34,7 @@ class WordsUploadFragment : Fragment() {
     }
 
     private lateinit var viewModel: WordsUploadViewModel
-    private val retrofitService = BrainheapClientFactory.get()
+    val itemRepositry = ItemRepository.instance
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,11 +121,9 @@ class WordsUploadFragment : Fragment() {
                 return@setOnClickListener
             }
             Toast.makeText(BrainheapApp.applicationContext(), "Trying to create item", Toast.LENGTH_SHORT).show()
-            QueueCallExecutor.add(
-                userId, null, ItemView(
-                    extractTitle(),
-                    HtmlTextBuilder.joinDescription(wordsContext.context, translation) ?: ""
-                )
+            itemRepositry.addItem(
+                null,
+                ItemView(extractTitle(), HtmlTextBuilder.joinDescription(wordsContext.context, translation) ?: "")
             )
             viewModel.itemSaved.postValue(true)
         }
@@ -155,6 +152,6 @@ class WordsUploadFragment : Fragment() {
                     .toLowerCase()
             }
             ?.joinToString(" ") { it }
-            ?:""
+            ?: ""
     }
 }

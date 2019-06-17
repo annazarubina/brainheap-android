@@ -1,5 +1,6 @@
 package com.brainheap.android.network.client
 
+import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.model.ItemView
 import com.brainheap.android.repository.database.BrainheapDatabase
@@ -11,19 +12,18 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 
-object QueueCallExecutor {
+class QueueCallExecutor {
     private var job: Job? = null
     private val dao: QueueCallDao = BrainheapDatabase.instance(BrainheapApp.application()).queueCallDao()
+    val callSucceed = MutableLiveData<QueueCallItem>()
 
-    @ObsoleteCoroutinesApi
-    @Synchronized
-    fun add(userId: String, itemId: String?, itemView: ItemView) {
+   @Synchronized
+    fun add(action: QueueCallItem.Action, userId: String, itemId: String?, itemView: ItemView?) {
         CoroutineScope(newSingleThreadContext(this.javaClass.name + ":add")).launch {
-            dao.insert(QueueCallItem(userId, itemId, itemView))
+            dao.insert(QueueCallItem(action, userId, itemId, itemView))
         }
     }
 
-    @ObsoleteCoroutinesApi
     fun start() {
         job?.let {
             return
@@ -48,7 +48,11 @@ object QueueCallExecutor {
 
     private fun execute(data: QueueCallItem): Boolean {
         return try {
-            QueueCallBuilder(data).build().execute().isSuccessful
+            if (QueueCallBuilder(data).build().execute().isSuccessful) {
+                callSucceed.postValue(data)
+                return true
+            }
+            return false
         } catch (e: Throwable) {
             false
         }
