@@ -2,13 +2,11 @@ package com.brainheap.android.network.client
 
 import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
-import com.brainheap.android.model.ItemView
 import com.brainheap.android.repository.database.BrainheapDatabase
 import com.brainheap.android.repository.database.QueueCallDao
 import com.brainheap.android.repository.database.QueueCallItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 
@@ -17,10 +15,10 @@ class QueueCallExecutor {
     private val dao: QueueCallDao = BrainheapDatabase.instance(BrainheapApp.application()).queueCallDao()
     val callSucceed = MutableLiveData<QueueCallItem>()
 
-   @Synchronized
-    fun add(action: QueueCallItem.Action, userId: String, itemId: String?, itemView: ItemView?) {
+    @Synchronized
+    fun add(queueItem: QueueCallItem) {
         CoroutineScope(newSingleThreadContext(this.javaClass.name + ":add")).launch {
-            dao.insert(QueueCallItem(action, userId, itemId, itemView))
+            dao.insert(queueItem)
         }
     }
 

@@ -5,7 +5,7 @@ import com.brainheap.android.repository.ItemRepository
 import com.brainheap.android.repository.ItemsListPeriod
 
 class WordsListViewModel : ViewModel() {
-    val itemRepositry = ItemRepository.instance
+    val itemRepositry = ItemRepository.instance()
 
     fun refresh() {
         itemRepositry.syncList(true)

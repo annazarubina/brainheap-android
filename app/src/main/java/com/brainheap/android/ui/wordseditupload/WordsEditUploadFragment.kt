@@ -22,7 +22,7 @@ class WordsEditUploadFragment : Fragment() {
     }
 
     private lateinit var viewModel: WordsEditUploadViewModel
-    val itemRepositry = ItemRepository.instance
+    val itemRepositry = ItemRepository.instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -34,7 +34,7 @@ class WordsUploadFragment : Fragment() {
     }
 
     private lateinit var viewModel: WordsUploadViewModel
-    val itemRepositry = ItemRepository.instance
+    val itemRepositry = ItemRepository.instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -22,6 +22,7 @@ class WordDetailFragment : Fragment() {
 
     private var itemId: String? = null
     private var item: Item? = null
+    val itemRepositry = ItemRepository.instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +41,7 @@ class WordDetailFragment : Fragment() {
             startEditActivity()
         }
 
-        ItemRepository.instance.isRefreshing.observe(this, Observer<Boolean> {
+        itemRepositry.isRefreshing.observe(this, Observer<Boolean> {
             word_detail_text_view.isEnabled = !it
             word_detail_edit_item_button.isEnabled = !it
             when(it) {
@@ -49,7 +50,7 @@ class WordDetailFragment : Fragment() {
             }
         })
 
-        ItemRepository.instance.liveItemsList.observe(this, Observer<List<Item>> {
+        itemRepositry.liveItemsList.observe(this, Observer<List<Item>> {
             loadItem()
             word_detail_text_view.setText(getItemHtmlText())
         })
@@ -57,7 +58,7 @@ class WordDetailFragment : Fragment() {
 
     private fun loadItem() {
         itemId?.let {
-            item = ItemRepository.instance.getItem(it)
+            item = itemRepositry.getItem(it)
         }
     }
 
@@ -77,7 +78,7 @@ class WordDetailFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDIT_WORDS_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                ItemRepository.instance.syncList(true)
+                itemRepositry.syncList(true)
             }
         }
     }

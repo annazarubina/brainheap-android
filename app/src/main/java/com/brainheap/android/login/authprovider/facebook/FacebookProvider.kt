@@ -1,17 +1,19 @@
 package com.brainheap.android.login.authprovider.facebook
 
 import android.content.Intent
+import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.brainheap.android.BrainheapApp
 import com.brainheap.android.login.AuthProvider
-import com.brainheap.android.login.authprovider.facebook.client.FacebookClientFactory
 import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.login.data.OAuthUserData
+import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.FacebookSdk
+import com.facebook.GraphRequest
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
@@ -41,7 +43,7 @@ class FacebookProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(d
                         Toast.LENGTH_SHORT
                     )
                         .show()
-                    getAuthUserEmail(loginResult.accessToken.userId, loginResult.accessToken.token)
+                    getAuthUserEmail(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
@@ -68,25 +70,31 @@ class FacebookProvider(data: MutableLiveData<AuthProgressData>) : AuthProvider(d
 
     override fun getRequestCode(): Int = 9002
 
-    private fun getAuthUserEmail(userId: String, token: String) {
+    private fun getAuthUserEmail(accessToken: AccessToken) {
         CoroutineScope(Dispatchers.IO).launch {
             var toastMessage: String? = null
-            try {
-                val request = FacebookClientFactory.get().getUserInfoAsync(userId, token)
-                val response = request.await()
-                require(response.isSuccessful) { "Get user info failed: ${response.code()}" }
-                val email = response.body()?.email
-                require(email?.isNotEmpty() ?: false) { "Email is empty" }
-                onLoginSuccess(
-                    OAuthUserData(
-                        email,
-                        token
+            val request = GraphRequest.newMeRequest(accessToken) { `object`, response ->
+                require(response.connection.responseCode == 200) { "Get user info failed: ${response.connection.responseCode}" }
+                try {
+                    val email = `object`.get("email") as String?
+                    require(email?.isNotEmpty() ?: false) { "Email is empty" }
+                    onLoginSuccess(
+                        OAuthUserData(
+                            email,
+                            accessToken.token
+                        )
                     )
-                )
-            } catch (e: Throwable) {
-                toastMessage = "Exception ${e.message}"
-                onLoginFailed()
+                } catch (e: Exception) {
+                    toastMessage = "Exception ${e.message}"
+                    onLoginFailed()
+                }
             }
+
+            val parameters = Bundle()
+            parameters.putString("fields", "email")
+            request.parameters = parameters
+            request.executeAndWait()
+
             toastMessage?.let {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(BrainheapApp.applicationContext(), "Facebook auth error: $it", Toast.LENGTH_SHORT)

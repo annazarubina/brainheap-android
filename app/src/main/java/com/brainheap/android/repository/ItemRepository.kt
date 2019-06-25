@@ -16,11 +16,11 @@ import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.repository.database.QueueCallItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 enum class ItemsListPeriod(val idx: Int) {
     TODAY(0),
@@ -65,19 +65,24 @@ class ItemRepository : LifecycleOwner {
     }
 
     fun deleteItem(itemId: String) {
-        queueCallExecutor.add(
+        val item = QueueCallItem(
             QueueCallItem.Action.DELETE,
             CredentialsHolder.userId.value!!, itemId, null
         )
-        liveItemsList.postValue(liveItemsList.value?.filter { it.id != itemId })
+
+        queueCallExecutor.add(item)
+        applyQueueActionToList(item)
     }
 
     fun addItem(itemId: String?, itemView: ItemView) {
-        queueCallExecutor.add(itemId?.let { QueueCallItem.Action.UPDATE } ?: let { QueueCallItem.Action.CREATE },
+        val item = QueueCallItem(itemId?.let { QueueCallItem.Action.UPDATE } ?: let { QueueCallItem.Action.CREATE },
             CredentialsHolder.userId.value!!,
             itemId,
             itemView
         )
+
+        queueCallExecutor.add(item)
+        applyQueueActionToList(item)
     }
 
     fun syncList(force: Boolean) {
@@ -132,7 +137,62 @@ class ItemRepository : LifecycleOwner {
         }
     }
 
+    private fun applyQueueActionToList(list: List<Item>?, queueItem: QueueCallItem): List<Item>? {
+        return when (queueItem.action) {
+            QueueCallItem.Action.DELETE -> list?.filter { it.id != queueItem.itemId }
+            QueueCallItem.Action.CREATE -> {
+                queueItem.itemView?.let {
+                    val array = list?.let { ArrayList(it) } ?: ArrayList<Item>()
+                    array.add(
+                        0,
+                        Item(
+                            "",
+                            queueItem.itemView.description,
+                            TEMP_ID_PREFIX + generateUUID(),
+                            "",
+                            queueItem.itemView.title,
+                            queueItem.userId
+                        )
+                    )
+                    return array
+                } ?: let { return null }
+            }
+            QueueCallItem.Action.UPDATE -> {
+                queueItem.itemView?.let {
+                    return list?.map {
+                        it.takeIf { it.id != queueItem.itemId }
+                            ?: Item(
+                                it.created,
+                                queueItem.itemView.description,
+                                it.id,
+                                it.modified,
+                                queueItem.itemView.title,
+                                it.userId
+                            )
+                    }
+                } ?: let { return null }
+            }
+        }
+    }
+
+    private fun applyQueueActionToList(queueItem: QueueCallItem) {
+        applyQueueActionToList(liveItemsList.value, queueItem)?.let { liveItemsList.postValue(it) }
+    }
+
     companion object {
-        val instance = ItemRepository()
+        @JvmStatic
+        val TEMP_ID_PREFIX = "temp:"
+
+        @JvmStatic
+        private var singleton: ItemRepository? = null
+
+        @JvmStatic
+        fun instance(): ItemRepository = singleton?.let { it } ?: let {
+            singleton = ItemRepository()
+            singleton!!
+        }
+
+        @JvmStatic
+        fun generateUUID() = UUID.randomUUID().toString()
     }
 }
