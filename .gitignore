@@ -17,3 +17,6 @@ build/
 
 # Log Files
 *.log
+
+# Local properties
+local.properties
