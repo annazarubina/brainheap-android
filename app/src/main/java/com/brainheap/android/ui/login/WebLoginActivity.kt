@@ -2,6 +2,7 @@ package com.brainheap.android.ui.login
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.brainheap.android.config.BrainheapProperties
 import com.brainheap.android.config.BrainheapProperties.redirectUri
 import java.util.*
+import android.webkit.CookieSyncManager
+import android.os.Build
+
+
 
 class WebLoginActivity : AppCompatActivity() {
     companion object {
@@ -34,6 +39,7 @@ class WebLoginActivity : AppCompatActivity() {
 
         val webview = WebView(activity)
         webview.settings.javaScriptEnabled = true
+        clearWebView(webview)
 
         webview.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
@@ -79,5 +85,12 @@ class WebLoginActivity : AppCompatActivity() {
         }
         setContentView(webview)
         webview.loadUrl(BrainheapProperties.loginUrl)
+    }
+
+    private fun clearWebView(webView: WebView) {
+        webView.clearCache(true)
+        webView.clearHistory()
+        CookieManager.getInstance().removeAllCookies(null)
+        CookieManager.getInstance().flush()
     }
 }
