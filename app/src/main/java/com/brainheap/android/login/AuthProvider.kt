@@ -12,12 +12,14 @@ import com.brainheap.android.login.data.OAuthUserData
 import com.brainheap.android.model.UserView
 import com.brainheap.android.network.HttpClientFactory
 import com.brainheap.android.network.client.BrainheapClientFactory
+import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.ui.login.WebLoginActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import retrofit2.Response
 
 @SuppressLint("StaticFieldLeak")
 object AuthProvider {
@@ -31,10 +33,12 @@ object AuthProvider {
         clean()
         this.activity = activity
         start()
-        doLogin()
+        activity.startActivityForResult(Intent(activity, WebLoginActivity::class.java), getRequestCode())
     }
 
     fun logout() {
+        val response = client.logout().execute()
+        require(response.isSuccessful){"Error logging out. Error: ${response.code()}"}
         clean()
     }
 
@@ -85,7 +89,7 @@ object AuthProvider {
                     ?.let { onSuccess(userId, value) }
                     ?: let { onFailed() }
             }
-        } ?: let { onFailed() }
+        } ?: onFailed()
     }
 
     private fun onSuccess(userId: String, oAuthData: OAuthUserData) {
@@ -104,10 +108,6 @@ object AuthProvider {
         data.postValue(AuthProgressData(null, null, null, true))
     }
 
-    private fun doLogin() {
-        activity?.startActivityForResult(Intent(activity, WebLoginActivity::class.java), getRequestCode())
-    }
-
     private fun doOnLoginActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         intent?.data
             ?.takeIf { it.toString().startsWith(BrainheapProperties.redirectUri) }
@@ -117,7 +117,7 @@ object AuthProvider {
     }
 
     private fun getUserEmail(jSessionId: String) {
-        HttpClientFactory.jSessionId = jSessionId
+        CredentialsHolder.jSessionId.postValue(jSessionId)
         CoroutineScope(Dispatchers.IO).launch {
             var toastMessage: String? = null
             try {

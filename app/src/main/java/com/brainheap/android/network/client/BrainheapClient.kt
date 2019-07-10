@@ -15,6 +15,9 @@ object BrainheapClientFactory :
     RefrofitClientFactory<BrainheapClient>(BrainheapClient::class.java, BrainheapProperties.baseUrl)
 
 interface BrainheapClient {
+    @GET("/logout")
+    fun logout(): Call<Any>
+
     @GET("/currentuser")
     fun getCurrentUser(): Call<String>
 

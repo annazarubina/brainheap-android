@@ -1,5 +1,6 @@
 package com.brainheap.android.network
 
+import com.brainheap.android.preferences.CredentialsHolder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -10,7 +11,6 @@ class HttpClientFactory {
 
     companion object {
         private var instance: OkHttpClient? = null
-        var jSessionId: String? = null
 
         fun instance(): OkHttpClient {
             instance?:let {
@@ -30,19 +30,19 @@ class HttpClientFactory {
 
         private fun processRequest(request: Request) : Request =
             request.newBuilder()
-                .header("User-Agent", "Your-App-Name")
-                .header("Cookie", "JSESSIONID=$jSessionId")
-                .header("Accept", "application/vnd.yourapi.v1.full+json")
+                .header("User-Agent", "com.brainheap.android")
+                .header("Cookie", "JSESSIONID=${CredentialsHolder.jSessionId.value}")
+                .header("Accept", "application/json")
                 .method(request.method(), request.body())
                 .build()
 
         private fun processResponse(response: Response) : Response {
-            val cookieHeaders = response.headers("cookie")
-            for (cookieHeader in cookieHeaders) {
-                if (cookieHeader.contains("JSESSIONID=")) {
-                    jSessionId = cookieHeader.substring(11, cookieHeader.indexOf(';'))
-                }
-            }
+//            val cookieHeaders = response.headers("cookie")
+//            for (cookieHeader in cookieHeaders) {
+//                if (cookieHeader.contains("JSESSIONID=")) {
+//                    jSessionId = cookieHeader.substring(11, cookieHeader.indexOf(';'))
+//                }
+//            }
             return response
         }
     }

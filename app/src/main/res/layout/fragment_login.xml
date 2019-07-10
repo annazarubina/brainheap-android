@@ -17,36 +17,20 @@
             android:layout_marginTop="150dp"
             android:visibility="gone"
             android:padding="10dp"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Name"
-            android:ems="10"
-            android:id="@+id/emailEditText" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent"/>
     <Button
-            android:text="Set email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/emailSetButton" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/emailEditText" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"/>
-    <Button
-            android:text="Login or register"
+            android:text="Login to BrainHeap"
+            android:background="#3B5998"
+            android:textColor="#ffffff"
             android:id="@+id/login_button"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/emailSetButton"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="30dp"
-            android:textAllCaps="false"
-            android:layout_marginBottom="30dp"
-            android:paddingRight="20dp"
-            android:paddingLeft="20dp"/>
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

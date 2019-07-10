@@ -22,9 +22,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_login)
-
-        emailEditText.setText(AppPreferences.get().getString(Constants.NAME_PROP, "Unknown"))
-
         login_button.setOnClickListener {
             provider.login(this)
         }
@@ -62,6 +59,7 @@ class LoginActivity : AppCompatActivity() {
         if (!data.inProgress && data.userId?.isNotEmpty() == true) {
             CredentialsHolder.userId.postValue(data.userId)
             CredentialsHolder.email.postValue(data.email)
+            CredentialsHolder.jSessionId.postValue(data.jSessionId)
             AppPreferences.get().edit().putString(Constants.ID_PROP, data.userId).apply()
             AppPreferences.get().getString(Constants.NAME_PROP, "Unknown")
             finish()
