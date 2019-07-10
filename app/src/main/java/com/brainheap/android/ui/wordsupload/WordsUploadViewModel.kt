@@ -67,7 +67,7 @@ class WordsUploadViewModel : ViewModel() {
                     CoroutineScope(Dispatchers.IO).launch {
                         cashedTranslation = try {
                             val request = retrofitService
-                                .translateAsync(userId!!, "\"" + it + "\"")
+                                .translateAsync("\"" + it + "\"")
                             val response = request.await()
                             require(response.isSuccessful) { "Result: ${response.code()}" }
                             response.body()

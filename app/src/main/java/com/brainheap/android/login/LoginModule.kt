@@ -10,7 +10,6 @@ import com.brainheap.android.preferences.CredentialsHolder
 import com.brainheap.android.ui.login.LoginActivity
 
 class LoginModule {
-    private val providerManager = AuthProviderManager
 
     fun isLoggedIn() = CredentialsHolder.userId.value?.isNotEmpty() ?: false
 
@@ -18,7 +17,7 @@ class LoginModule {
 
     fun logOut() {
         AppPreferences.get().edit().putString(Constants.ID_PROP, "").apply()
-        AuthProviderManager.logout()
+        AuthProvider.logout()
         CredentialsHolder.clean()
     }
 }

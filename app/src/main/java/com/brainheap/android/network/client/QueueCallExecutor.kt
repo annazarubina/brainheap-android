@@ -46,7 +46,7 @@ class QueueCallExecutor {
 
     private fun execute(data: QueueCallItem): Boolean {
         return try {
-            if (QueueCallBuilder(data).build().execute().isSuccessful) {
+            if (QueueCallBuilder(data).build()?.execute()?.isSuccessful == true) {
                 callSucceed.postValue(data)
                 return true
             }

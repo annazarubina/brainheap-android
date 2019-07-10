@@ -1,40 +1,37 @@
 package com.brainheap.android.login
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.brainheap.android.BrainheapApp
+import com.brainheap.android.config.BrainheapProperties
 import com.brainheap.android.login.data.AuthProgressData
 import com.brainheap.android.login.data.OAuthUserData
 import com.brainheap.android.model.UserView
+import com.brainheap.android.network.HttpClientFactory
 import com.brainheap.android.network.client.BrainheapClientFactory
+import com.brainheap.android.ui.login.WebLoginActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
-abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
-    enum class Type(val string: String) {
-        GOOGLE("GOOGLE"),
-        FACEBOOK("FACEBOOK"),
-        KEYCLOAK_SERVER("KEYCLOAK_SERVER")
-    }
+@SuppressLint("StaticFieldLeak")
+object AuthProvider {
+    val data = MutableLiveData<AuthProgressData>()
 
-    protected var activity: Activity? = null
+    private val client = BrainheapClientFactory.get()
+
+    private var activity: Activity? = null
 
     fun login(activity: Activity) {
         clean()
         this.activity = activity
         start()
         doLogin()
-    }
-
-    fun loginByEmailOnly(email: String?, activity: Activity) {
-        clean()
-        this.activity = activity
-        start()
-        loadUserId(OAuthUserData(email, null))
     }
 
     fun logout() {
@@ -45,16 +42,11 @@ abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
         doOnLoginActivityResult(requestCode, resultCode, intent)
     }
 
-    protected abstract fun doLogin()
-    protected abstract fun doOnLoginActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
-
-    abstract fun getRequestCode(): Int
-
-    protected fun onLoginSuccess(value: OAuthUserData) {
+    private fun onLoginSuccess(value: OAuthUserData) {
         loadUserId(value)
     }
 
-    protected fun onLoginFailed() {
+    private fun onLoginFailed() {
         onFailed()
     }
 
@@ -65,13 +57,11 @@ abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
                 val retrofitService = BrainheapClientFactory.get()
                 var toastMessage: String? = null
                 try {
-                    val findUserRequest = retrofitService.findUserAsync(email)
-                    val findUserResponse = findUserRequest.await()
+                    val findUserResponse = retrofitService.findUser(email).execute()
                     if (findUserResponse.isSuccessful) {
                         userId = findUserResponse.body()?.firstOrNull()?.id
                     } else if (findUserResponse.code() == 404) {
-                        val createUserRequest = retrofitService.createUserAsync(UserView(email, email))
-                        val createUserResponse = createUserRequest.await()
+                        val createUserResponse = retrofitService.createUser(UserView(email, email)).execute()
                         if (createUserResponse.isSuccessful) {
                             userId = createUserResponse.body()?.id
                         } else {
@@ -99,7 +89,7 @@ abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
     }
 
     private fun onSuccess(userId: String, oAuthData: OAuthUserData) {
-        data.postValue(AuthProgressData(userId, oAuthData.email, oAuthData.token, false))
+        data.postValue(AuthProgressData(userId, oAuthData.email, oAuthData.jSessionId, false))
     }
 
     private fun onFailed() {
@@ -113,4 +103,45 @@ abstract class AuthProvider(val data: MutableLiveData<AuthProgressData>) {
     private fun start() {
         data.postValue(AuthProgressData(null, null, null, true))
     }
+
+    private fun doLogin() {
+        activity?.startActivityForResult(Intent(activity, WebLoginActivity::class.java), getRequestCode())
+    }
+
+    private fun doOnLoginActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        intent?.data
+            ?.takeIf { it.toString().startsWith(BrainheapProperties.redirectUri) }
+            ?.let { intent.getStringExtra(WebLoginActivity.JSESSIONID) }
+            ?.let { getUserEmail(it) }
+            ?: onLoginFailed()
+    }
+
+    private fun getUserEmail(jSessionId: String) {
+        HttpClientFactory.jSessionId = jSessionId
+        CoroutineScope(Dispatchers.IO).launch {
+            var toastMessage: String? = null
+            try {
+                val response = client.getCurrentUser().execute()
+                require(response.isSuccessful) { "Get current user failed: ${response.code()}" }
+                val email = response.body()
+                require(email?.isNotEmpty() ?: false) { "Email is empty" }
+                onLoginSuccess(
+                    OAuthUserData(
+                        email,
+                        jSessionId
+                    )
+                )
+            } catch (e: Throwable) {
+                toastMessage = "Exception ${e.message}"
+                onLoginFailed()
+            }
+            toastMessage?.let {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(BrainheapApp.applicationContext(), "Error: $it", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun getRequestCode(): Int = 9003
 }

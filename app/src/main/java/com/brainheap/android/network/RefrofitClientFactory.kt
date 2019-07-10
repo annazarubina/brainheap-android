@@ -19,6 +19,7 @@ abstract class RefrofitClientFactory<T>(private val clazz: Class<T>, val baseUrl
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .client(HttpClientFactory.instance())
             .build().create(clazz)
         return client!!
     }

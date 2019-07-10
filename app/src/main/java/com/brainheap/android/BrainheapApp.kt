@@ -2,11 +2,15 @@ package com.brainheap.android
 
 import android.app.Application
 import android.content.Context
-import com.brainheap.android.network.client.QueueCallExecutor
+import java.net.CookieHandler
+import java.net.CookieManager
+import java.net.CookiePolicy.ACCEPT_ALL
+import java.net.CookieStore
 
 class BrainheapApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        CookieHandler.setDefault(CookieManager(null, ACCEPT_ALL))
         instance = this
     }
 

@@ -92,7 +92,7 @@ class ItemRepository : LifecycleOwner {
                     isRefreshing.postValue(true)
                     try {
                         val query = queryFromPeriod(period.value!!)
-                        val itemListResponse = retrofitService.findItemsAsync(it, query).await()
+                        val itemListResponse = retrofitService.findItemsAsync(query).await()
                         if (itemListResponse.isSuccessful) {
                             liveItemsList.postValue(itemListResponse.body())
                         }

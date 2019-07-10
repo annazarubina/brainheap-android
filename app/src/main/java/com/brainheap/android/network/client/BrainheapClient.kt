@@ -15,24 +15,27 @@ object BrainheapClientFactory :
     RefrofitClientFactory<BrainheapClient>(BrainheapClient::class.java, BrainheapProperties.baseUrl)
 
 interface BrainheapClient {
+    @GET("/currentuser")
+    fun getCurrentUser(): Call<String>
+
     @GET("/users")
-    fun findUserAsync(@Query("email") email: String): Deferred<Response<List<User>>>
+    fun findUser(@Query("email") email: String): Call<List<User>>
 
     @POST("/users")
-    fun createUserAsync(@Body user: UserView): Deferred<Response<User>>
+    fun createUser(@Body user: UserView): Call<User>
 
     @POST("/items/new")
-    fun createItem(@Header("Authorization") userId: String, @Body item: ItemView): Call<Item>
+    fun createItem(@Body item: ItemView): Call<Item>
 
     @PATCH("/items/{itemId}")
-    fun updateItem(@Header("Authorization") userId: String, @Path("itemId") itemId:String, @Body item: ItemView): Call<Item>
+    fun updateItem(@Path("itemId") itemId:String, @Body item: ItemView): Call<Item>
 
     @GET("/items")
-    fun findItemsAsync(@Header("Authorization") userId: String, @Query("query") query: String?): Deferred<Response<List<Item>>>
+    fun findItemsAsync(@Query("query") query: String?): Deferred<Response<List<Item>>>
 
     @DELETE("/items/{itemId}")
-    fun deleteItem(@Header("Authorization") userId: String, @Path("itemId") itemId:String): Call<Item>
+    fun deleteItem(@Path("itemId") itemId:String): Call<Item>
 
     @GET("/translate")
-    fun translateAsync(@Header("Authorization") userId: String, @Query("srcString") srcString: String ): Deferred<Response<String>>
+    fun translateAsync(@Query("srcString") srcString: String ): Deferred<Response<String>>
 }

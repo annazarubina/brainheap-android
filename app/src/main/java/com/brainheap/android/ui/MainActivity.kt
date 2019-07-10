@@ -7,8 +7,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.brainheap.android.R
 import com.brainheap.android.login.LoginModule
-import com.facebook.FacebookSdk
-
 
 class MainActivity : AppCompatActivity() {
     private val loginModule = LoginModule()
