@@ -22,7 +22,10 @@ import android.os.Build
 
 
 class WebLoginActivity : AppCompatActivity() {
+
     companion object {
+        const val USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 4.1.1; Galaxy Nexus Build/JRO03C) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"
         const val JSESSIONID = "JSESSIONID"
     }
 
@@ -38,6 +41,7 @@ class WebLoginActivity : AppCompatActivity() {
         val activity: Activity = this
 
         val webview = WebView(activity)
+        webview.settings.userAgentString = USER_AGENT
         webview.settings.javaScriptEnabled = true
         clearWebView(webview)
 
