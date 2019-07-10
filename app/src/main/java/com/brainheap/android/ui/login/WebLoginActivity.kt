@@ -90,7 +90,22 @@ class WebLoginActivity : AppCompatActivity() {
     private fun clearWebView(webView: WebView) {
         webView.clearCache(true)
         webView.clearHistory()
-        CookieManager.getInstance().removeAllCookies(null)
-        CookieManager.getInstance().flush()
+        clearCookies()
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    fun clearCookies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+        } else {
+            val cookieSyncMngr = CookieSyncManager.createInstance(this)
+            cookieSyncMngr.startSync()
+            val cookieManager = CookieManager.getInstance()
+            cookieManager.removeAllCookie()
+            cookieManager.removeSessionCookie()
+            cookieSyncMngr.stopSync()
+            cookieSyncMngr.sync()
+        }
     }
 }
